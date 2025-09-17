@@ -5,6 +5,131 @@ Project Name: livedrop-jason
 
 Graph Link: https://excalidraw.com/#json=M8LGOKU5j_-nvKR0dCe05,Mnvre2y5pI0ehtiXNCO8UQ
 
+🔹 Public APIs (Client-Facing)
+
+These are exposed through the API Gateway to mobile/web clients.
+
+1. Authentication & Users
+
+POST /api/auth/register → Register a new user
+Body: { name, email, password }
+
+POST /api/auth/login → Login, returns JWT token
+
+GET /api/users/:id → Get user profile
+
+PUT /api/users/:id → Update profile
+
+DELETE /api/users/:id → Delete account
+
+2. Creators & Followers
+
+POST /api/creators → Create/upgrade creator profile
+
+GET /api/creators/:id → Get creator details
+
+GET /api/creators → List all creators
+
+POST /api/followers → Follow creator { userId, creatorId }
+
+DELETE /api/followers → Unfollow creator
+
+GET /api/creators/:id/followers → List followers
+
+3. Products & Drops
+
+POST /api/products → Create product (creator only)
+
+GET /api/products/:id → Get product details
+
+GET /api/creators/:id/products → List products of a creator
+
+POST /api/drops → Create drop (creator only)
+
+GET /api/drops?status=live|upcoming|ended → List drops by status
+
+GET /api/drops/:id → Get drop details
+
+4. Orders & Payments
+
+POST /api/orders → Place new order { userId, dropId, productId, quantity }
+
+GET /api/orders/:id → Get order details
+
+GET /api/users/:id/orders → Get user’s orders
+
+PUT /api/orders/:id/cancel → Cancel order
+
+POST /api/payments → Initiate payment { orderId, amount, method }
+
+GET /api/payments/:id → Get payment status
+
+5. Notifications
+
+GET /api/users/:id/notifications → Get notifications for user
+
+PUT /api/notifications/:id/read → Mark as read
+
+6. Real-Time (WebSocket/Push)
+
+ws://.../push → Real-time events (drop started, low stock, sold out, order confirmed).
+
+🔹 Internal APIs (Microservices Communication)
+
+These are not public, used for service-to-service RPC/REST/Kafka.
+
+1. Inventory Service
+
+POST /internal/inventory/reserve
+Body: { dropId, userId, quantity } → Reserve stock
+
+POST /internal/inventory/release
+Body: { reservationId } → Release reserved stock
+
+POST /internal/inventory/confirm
+Body: { reservationId } → Deduct from available stock
+
+2. Payment Service
+
+POST /internal/payments/charge
+Body: { orderId, amount, method } → Charge via payment provider
+
+POST /internal/payments/refund
+Body: { paymentId } → Refund payment
+
+3. Notification Service
+
+POST /internal/notifications/send
+Body: { userId, type, payload } → Send notification (push + save in DB)
+
+4. Order Service
+
+Communicates with Inventory and Payment services to ensure atomic ordering:
+
+Reserve stock
+
+Process payment
+
+Confirm order & deduct inventory
+
+Trigger notification
+
+🔹 API Contract Principles
+
+Authentication: JWT for all public APIs, internal APIs secured with service-to-service tokens.
+
+Idempotency: Order creation & payment APIs use idempotency keys to prevent duplicates.
+
+Response format: JSON { success, data, error }
+
+Errors: Standardized error codes (400, 401, 403, 404, 409, 500).
+
+⚡ This structure ensures:
+
+Public APIs → clean, client-friendly.
+
+Internal APIs → microservices can coordinate safely without exposing business logic.
+
 System Design Explanation
 This document outlines the system design for the "Live Drops" platform, a flash-sale and follow platform designed to handle high-traffic, limited-inventory product drops by creators. The approach is based on a 
 
