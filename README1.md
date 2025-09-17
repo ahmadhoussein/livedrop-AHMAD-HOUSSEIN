@@ -1,4 +1,4 @@
-
+<img width="2425" height="2149" alt="image" src="https://github.com/user-attachments/assets/64810631-1be6-483a-af24-07ab342eef50" />
 [Uploading README.md…]()
 # livedrop-AHMAD-HOUSSEIN
 
@@ -12,7 +12,8 @@ Users can follow creators, browse products and drops, receive real-time notifica
 ---
 
 ### 🔗 Graph Link
-[Excalidraw Architecture Diagram](https://excalidraw.com/#json=M8LGOKU5j_-nvKR0dCe05,Mnvre2y5pI0ehtiXNCO8UQ)
+[Excalidraw Architecture Diagram](<img width="2425" height="2149" alt="image" src="https://github.com/user-attachments/assets/a676055e-d08b-4e76-b8c5-17cf5f7427ba" />
+)
 
 ---
 
