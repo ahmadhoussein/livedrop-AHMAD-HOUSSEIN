@@ -4,8 +4,160 @@ Live Drops - System Design Project
 Project Name: livedrop-jason
 
 Graph Link: https://excalidraw.com/#json=M8LGOKU5j_-nvKR0dCe05,Mnvre2y5pI0ehtiXNCO8UQ
+{
+📂 Data Model Sketches — Live Drops System
+1. User
+User {
+  userId (PK)
+  name
+  email (unique)
+  passwordHash
+  createdAt
+  updatedAt
+}
 
-🔹 Public APIs (Client-Facing)
+
+A User can be both a normal customer or upgraded to a Creator.
+
+One-to-One → User ↔ Creator
+
+2. Creator
+Creator {
+  creatorId (PK)
+  userId (FK → User.userId)
+  displayName
+  bio
+  profileImageUrl
+}
+
+
+A Creator is just a User with extra attributes.
+
+One-to-Many → Creator ↔ Product
+
+One-to-Many → Creator ↔ Drop
+
+3. Follower (join table for many-to-many)
+Follower {
+  followerId (PK)
+  userId (FK → User.userId)
+  creatorId (FK → Creator.creatorId)
+  createdAt
+}
+
+
+Many-to-Many → User ↔ Creator through Follower.
+
+4. Product
+Product {
+  productId (PK)
+  creatorId (FK → Creator.creatorId)
+  name
+  description
+  price
+  imageUrl
+  createdAt
+}
+
+
+One-to-Many → Product ↔ Drop.
+
+5. Drop
+Drop {
+  dropId (PK)
+  creatorId (FK → Creator.creatorId)
+  productId (FK → Product.productId)
+  startTime
+  endTime
+  totalStock
+  status (upcoming | live | ended)
+}
+
+
+One-to-One → Drop ↔ Inventory.
+
+One-to-Many → Drop ↔ Order.
+
+6. Inventory
+Inventory {
+  inventoryId (PK)
+  dropId (FK → Drop.dropId)
+  availableStock
+  reservedStock
+  soldStock
+  updatedAt
+}
+
+
+Helps avoid overselling with concurrency-safe updates.
+
+7. Order
+Order {
+  orderId (PK)
+  userId (FK → User.userId)
+  dropId (FK → Drop.dropId)
+  productId (FK → Product.productId)
+  quantity
+  totalPrice
+  status (pending | confirmed | cancelled)
+  paymentId (FK → Payment.paymentId)
+  createdAt
+}
+
+
+Many-to-Many → User ↔ Drop/Product through orders.
+
+One-to-One → Order ↔ Payment.
+
+8. Payment
+Payment {
+  paymentId (PK)
+  orderId (FK → Order.orderId)
+  amount
+  method (cash | credit)
+  status (initiated | successful | failed | refunded)
+  createdAt
+}
+
+
+Direct link to Order ensures idempotency in payments.
+
+9. Notification
+Notification {
+  notificationId (PK)
+  userId (FK → User.userId)
+  type (dropStarted | lowStock | soldOut | orderConfirmed)
+  payload (JSON)
+  isRead (boolean)
+  createdAt
+}
+
+
+One-to-Many → User ↔ Notification.
+
+payload (JSON) allows flexibility (e.g. dropId, stock info).
+
+🔗 Relationships Overview (ER-style)
+
+User ↔ Creator (1–1)
+
+User ↔ Follower ↔ Creator (M–M)
+
+Creator ↔ Product (1–M)
+
+Product ↔ Drop (1–M)
+
+Drop ↔ Inventory (1–1)
+
+User ↔ Order ↔ Drop/Product (M–M)
+
+Order ↔ Payment (1–1)
+
+User ↔ Notification (1–M)
+
+✨ These data model sketches give you a blueprint for database schema (whether SQL or NoSQL)}
+
+{🔹 Public APIs (Client-Facing)
 
 These are exposed through the API Gateway to mobile/web clients.
 
@@ -128,7 +280,35 @@ Errors: Standardized error codes (400, 401, 403, 404, 409, 500).
 
 Public APIs → clean, client-friendly.
 
-Internal APIs → microservices can coordinate safely without exposing business logic.
+Internal APIs → microservices can coordinate safely without exposing business logic.}
+
+{Cache Invalidation Strategy
+
+The system relies on caching to achieve low-latency reads and handle high traffic efficiently. We use Redis with structured keys and pub/sub for distributed invalidation.
+
+What to Cache: User/creator profiles, product metadata, follower lists, browsing results, and stock status snapshots.
+
+Invalidation Approaches:
+
+TTL-based: For relatively static data (e.g., profiles, product descriptions).
+
+Write-through / Write-around: For browsing data (products, drops).
+
+Event-driven: For critical, rapidly changing data (inventory, orders), using Kafka events (drop.started, inventory.decrement, order.confirmed).
+
+Selective Eviction: Invalidate only affected keys instead of flushing entire cache.
+
+
+Critical Writes: Operations like order placement and inventory updates always use the authoritative database to ensure strong consistency; cache is used only for read snapshots.
+✨In Summary
+
+Profiles/Products/Followers → TTL-based cache.
+
+Inventory/Orders → Event-driven invalidation via Kafka.
+
+Feed/Browsing → Write-through + periodic TTL refresh.
+
+Use Redis with structured keys and pub/sub to propagate invalidations across nodes.}
 
 System Design Explanation
 This document outlines the system design for the "Live Drops" platform, a flash-sale and follow platform designed to handle high-traffic, limited-inventory product drops by creators. The approach is based on a 
