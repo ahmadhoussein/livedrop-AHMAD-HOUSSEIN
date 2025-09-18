@@ -20,7 +20,7 @@ Users can follow creators, browse products and drops, receive real-time notifica
 
 ### Authen
 ```sql
-auten (
+authen (
   id BIGSERIAL PRIMARY KEY,
   name TEXT,
   email TEXT UNIQUE,
