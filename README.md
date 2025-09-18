@@ -16,7 +16,7 @@ Users can follow creators, browse products and drops, receive real-time notifica
 
 ---
 
-## 📂 Data Model Sketches (Enhanced)
+## 📂 Data Model Sketches 
 
 ### Users
 ```sql
