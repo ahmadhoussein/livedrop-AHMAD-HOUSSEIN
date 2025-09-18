@@ -18,9 +18,9 @@ Users can follow creators, browse products and drops, receive real-time notifica
 
 ## 📂 Data Model Sketches 
 
-### Authen
+### User/Authen
 ```sql
-authen (
+user (
   id BIGSERIAL PRIMARY KEY,
   name TEXT,
   email TEXT UNIQUE,
