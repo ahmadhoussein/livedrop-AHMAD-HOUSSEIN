@@ -12,7 +12,7 @@ Users can follow creators, browse products and drops, receive real-time notifica
 ---
 
 ### 🔗 Graph Link
-[Excalidraw Architecture Diagram](https://excalidraw.com/#json=Ic3nGbYxI94PmVayCQi0y,37rW8kt5WglOrTE7PQvplw)
+[Excalidraw Architecture Diagram](https://excalidraw.com/#json=9kXz-ce_A_Z5WpysMS1dx,Oc1XFMbogr4pyLSP60kcOQ)
 
 ---
 
