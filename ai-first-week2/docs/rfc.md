@@ -45,7 +45,7 @@ Democratize enterprise e-commerce by providing a **complete, customizable, and A
 ---
 
 ## Technical Specifications
-- **Performance:** Sub-2s page load; AI latency ≤250ms (search), ≤1000ms (support)  
+- **Performance:** Sub-2s page load; AI latency ≤250ms (search), ≤800ms (support)  
 - **Security:** Encrypted data in transit & at rest; PII masking in AI pipelines  
 - **Availability:** 99.9% uptime SLA with active-active failover  
 - **Integrations:** REST APIs for inventory, shipping, and accounting  
@@ -54,19 +54,10 @@ Democratize enterprise e-commerce by providing a **complete, customizable, and A
 ---
 
 ## AI Touchpoints (Sprint 1)
-1. **Smart Search Suggestions**  
-   - Semantic + typo-tolerant product search  
-   - Redis caching + vector DB (pgvector)  
-   - Fallback: keyword search  
-   - Metrics: CTR, query-to-purchase rate, abandonment reduction  
+1. **Smart Search Suggestions** - Semantic + typo-tolerant product search  
+2. **AI Support Assistant** - Answers FAQs + order-status queries instantly  
 
-2. **AI Support Assistant**  
-   - Answers FAQs + order-status queries instantly  
-   - FAQ embeddings + order API retrieval  
-   - Fallback: escalation to human agent  
-   - Metrics: resolution rate, CSAT, ticket deflection  
-
-(Full detail: [AI Capability Map](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/ai-capability-map.md), [Touchpoints](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/touchpoints.md), [Cost Model](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/cost-model.md))  
+(Full detail: [AI Capability Map](docs/ai-first/ai-capability-map.md))
 
 ---
 
@@ -102,9 +93,3 @@ Sprint 1 establishes the **foundation of AI in ShopLite**.
 - Long-term (Q2 2025): Visual Search, Price Optimization, Personalized Recommendations  
 
 This phased approach ensures **immediate ROI** while paving the way for **AI-driven differentiation** at enterprise scale.
-
----
-
-
-
-
