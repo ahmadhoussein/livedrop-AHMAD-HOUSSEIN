@@ -8,7 +8,7 @@ This screenshot provides a log of the **AI Support Assistant** in action, demons
 
 1.  **Happy Path (Successful Query):**
     * **User Input:** The user asks a direct question that the system is designed to handle: "What is my order status?".
-    * **System Response:** The assistant successfully retrieves the relevant information from its knowledge base and provides a specific, helpful answer: "Your order #12345 is currently in transit...". This proves the system can accurately handle in-scope queries.
+    * **System Response:** The assistant successfully retrieves the relevant information from its knowledge base and provides a specific, helpful answer: "Your order #12345 is currently in transit and...". This proves the system can accurately handle in-scope queries.
 
 2.  **Fallback Behavior (Out-of-Scope Queries):**
     * **User Input:** The user asks three different questions that are not in the system's knowledge base: "I need to return a shirt.", "What's your return policy?", and "Can I get a refund for my purchase?".
