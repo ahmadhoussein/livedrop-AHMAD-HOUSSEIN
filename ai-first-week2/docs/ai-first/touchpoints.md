@@ -42,17 +42,16 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 
 ### Latency Budget
 
-| Component           | Budget          |
-| ------------------- | --------------- |
-| Debounce            | 300ms           |
-| Network             | 20ms            |
-| Cache lookup        | 30ms            |
-| Semantic processing | 50ms            |
-| Vector search       | 100ms           |
-| Ranking             | 30ms            |
-| Response formatting | 15ms            |
-| Network return      | 5ms             |
-| **Total**           | **250ms (p95)** |
+
+| Component                          | Budget           |
+| ---------------------------------- | ---------------- |
+| Message reception + classification | 60ms             |
+| Cache + context retrieval          | 250ms            |
+| Model inference + response format  | 500ms            |
+| Final scoring + delivery           | 90ms             |
+| Logging                            | 100ms            |
+| **Total**                          | **1000ms (p95)** |
+
 
 ### Error & Fallback Behavior
 
