@@ -1,7 +1,7 @@
 # Cost Model – ShopLite AI Features
 
 ## Executive Summary
-This document provides detailed cost analysis for our two AI-enabled features. At current scale, total daily cost is **$934.50** with clear path to profitability through conversion improvements and support cost reduction.
+This document provides detailed cost analysis for our two AI-enabled features. At current scale, total daily cost is **$934.50** with a clear path to profitability through conversion improvements and support cost reduction.
 
 ---
 
@@ -36,21 +36,17 @@ This document provides detailed cost analysis for our two AI-enabled features. A
 ## Calculations
 
 ### Cost per Action
-**Search Suggestions**  
-Cost/action = (150/1000 × $0.15) + (50/1000 × $0.60)  
+**Search Suggestions** Cost/action = (150/1000 × $0.15) + (50/1000 × $0.60)  
 = $0.0525  
 
-**AI Support Assistant**  
-Cost/action = (800/1000 × $0.15) + (150/1000 × $0.60)  
+**AI Support Assistant** Cost/action = (800/1000 × $0.15) + (150/1000 × $0.60)  
 = $0.210  
 
 ### Daily Cost
-**Search**  
-Daily cost = $0.0525 × 50,000 × (1 - 0.70)  
+**Search** Daily cost = $0.0525 × 50,000 × (1 - 0.70)  
 = $787.50  
 
-**Support**  
-Daily cost = $0.210 × 1,000 × (1 - 0.30)  
+**Support** Daily cost = $0.210 × 1,000 × (1 - 0.30)  
 = $147.00  
 
 ---
@@ -69,14 +65,14 @@ Daily cost = $0.210 × 1,000 × (1 - 0.30)
 |--------------------|----------------|-----------|------------|--------------|
 | Search Suggestions | 50,000         | 70%       | $787.50    | $23,625      |
 | Support Assistant  | 1,000          | 30%       | $147.00    | $4,410       |
-| **Total**          | **51,000**     | -         | **$934.50**| **$28,035**  |
+| **Total** | **51,000** | -         | **$934.50**| **$28,035** |
 
 ### Projected Scale (10x Growth - March 2025)
 | Feature            | Daily Requests | Cache Hit | Daily Cost | Monthly Cost |
 |--------------------|----------------|-----------|------------|--------------|
-| Search Suggestions | 500,000        | 85%*      | $3,937.50  | $118,125     |
-| Support Assistant  | 10,000         | 40%*      | $1,260.00  | $37,800      |
-| **Total**          | **510,000**    | -         | **$5,197.50** | **$155,925** |
+| Search Suggestions | 500,000        | 85%* | $3,937.50  | $118,125     |
+| Support Assistant  | 10,000         | 40%* | $1,260.00  | $37,800      |
+| **Total** | **510,000** | -         | **$5,197.50** | **$155,925** |
 
 \*Improved cache rates through optimization
 
@@ -91,28 +87,24 @@ Our goal is to raise this to **50–60% within 3 months** through:
 3. **FAQ Preloading** → proactively cache high-frequency queries from the FAQ knowledge base.  
 4. **TTL Optimization** → dynamically adjust cache lifetimes based on query frequency (see Appendix function).  
 
-**Expected Impact:**  
-- Increasing support cache hit rate from 30% → 55% reduces token calls by ~25%, saving about **$1,100/month** at current scale.  
+**Expected Impact:** - Increasing support cache hit rate from 30% → 55% reduces token calls by ~25%, saving about **$1,100/month** at current scale.  
 - Improves consistency of answers for repetitive questions.  
 - Aligns with RFC latency goals by reducing inference calls.  
 
 ---
 
 ## ROI Analysis
-**Search**  
-Conversion improvement: +0.5%  
+**Search** Conversion improvement: +0.5%  
 Additional daily revenue = 20,000 × 0.005 × $50 = $5,000  
 Daily profit = $5,000 - $787.50 = $4,212.50  
 ROI = 535% ✓  
 
-**Support**  
-AI resolves 70% of 1,000 tickets = 700 tickets/day  
+**Support** AI resolves 70% of 1,000 tickets = 700 tickets/day  
 Cost saved = 700 × $5 = $3,500  
 Daily profit = $3,500 - $147.00 = $3,353  
 ROI = 2,282% ✓  
 
-**Combined**  
-Total daily cost = $934.50  
+**Combined** Total daily cost = $934.50  
 Total daily benefit ≈ $8,500  
 Payback = Immediate  
 
@@ -183,8 +175,3 @@ def calculate_optimal_ttl(query_frequency, storage_cost, api_cost):
         return 3600             # 1 hour
     else:
         return 300              # 5 minutes
-Token Estimation Formula
-python
-نسخ الكود
-def estimate_tokens(text):
-    return len(text) / 4   # ~1 token ≈ 4 characters
