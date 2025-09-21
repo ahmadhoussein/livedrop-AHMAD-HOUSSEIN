@@ -1,5 +1,11 @@
 # Touchpoint Specifications – ShopLite
 
+### Feasibility Note
+
+Product catalog API already exists with 10k SKUs updated hourly. Redis and pgvector are deployed in current infrastructure. Will use sentence-transformers library for embeddings generation. Next prototype step: Build embedding pipeline for top 500 SKUs and test semantic similarity scoring with sample queries to validate retrieval quality before full rollout.
+
+**Probe Documentation:** [See AI Support Assistant Simulation Log](livedrop-AHMAD-HOUSSEIN/ai-first-week2/docs/ai-first/probe.png)
+
 ## 1. Smart Search Suggestions
 
 ### Problem Statement
