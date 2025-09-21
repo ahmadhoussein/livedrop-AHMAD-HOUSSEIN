@@ -42,16 +42,17 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 
 ### Latency Budget
 
-
-| Component                          | Budget           |
-| ---------------------------------- | ---------------- |
-| Message reception + classification | 60ms             |
-| Cache + context retrieval          | 250ms            |
-| Model inference + response format  | 500ms            |
-| Final scoring + delivery           | 90ms             |
-| Logging                            | 100ms            |
-| **Total**                          | **1000ms (p95)** |
-
+| Component           | Budget          |
+| ------------------- | --------------- |
+| Debounce            | 300ms           |
+| Network             | 20ms            |
+| Cache lookup        | 30ms            |
+| Semantic processing | 50ms            |
+| Vector search       | 100ms           |
+| Ranking             | 30ms            |
+| Response formatting | 15ms            |
+| Network return      | 5ms             |
+| **Total** | **250ms (p95)** |
 
 ### Error & Fallback Behavior
 
@@ -76,7 +77,7 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 
 ### Problem Statement
 
-Support tickets average 4-hour response time with 60% being repetitive queries. Human agents handle 1,000 tickets daily at \$5/ticket cost. The AI assistant will resolve 70% instantly, reducing costs by \$3,500/day and improving CSAT.
+Support tickets average 4-hour response time with 60% being repetitive queries. Human agents handle 1,000 tickets daily at $5/ticket cost. The AI assistant will resolve 70% instantly, reducing costs by $3,500/day and improving CSAT.
 
 ### Happy Path Flow
 
@@ -109,12 +110,12 @@ Support tickets average 4-hour response time with 60% being repetitive queries. 
 | Intent classification | 50ms             |
 | Cache lookup          | 50ms             |
 | Context retrieval     | 200ms            |
-| Model inference       | 400ms            |
-| Formatting            | 100ms            |
+| Model inference       | 200ms            |
+| Formatting            | 50ms             |
 | Scoring               | 50ms             |
 | Delivery              | 40ms             |
 | Logging               | 100ms            |
-| **Total**             | **1000ms (p95)** |
+| **Total** | **800ms (p95)** |
 
 ### Error & Fallback Behavior
 
@@ -142,7 +143,7 @@ To ensure continuous improvement, every error or escalation will be investigated
 
 * **Product Metric 1**: Resolution Rate = AI resolved ÷ Total queries (Target 70%)
 * **Product Metric 2**: Avg Handle Time = Total handling time ÷ Conversations (Target <90s)
-* **Business Metric**: Cost per Resolution = Total cost ÷ AI resolutions (Target <\$0.50)
+* **Business Metric**: Cost per Resolution = Total cost ÷ AI resolutions (Target <$0.50)
 
 ---
 
