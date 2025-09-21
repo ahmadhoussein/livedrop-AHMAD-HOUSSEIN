@@ -1,27 +1,17 @@
 # Touchpoint Specifications – ShopLite
 
-## Executive Summary
-
-This document provides detailed specifications for two AI-enabled touchpoints launching in Sprint 1: Smart Search Suggestions and AI Support Assistant. Each specification includes technical requirements, operational procedures, and success metrics.
-
----
-
 ## 1. Smart Search Suggestions
 
 ### Problem Statement
 
-Current keyword-based search fails on 23% of queries due to typos, synonyms, and semantic variations ("runing shoes," "sneakers for jogging"). This causes cart abandonment and reduces conversion by an estimated 0.8%. Users expect Google-like search intelligence that understands intent, not just exact matches. Our AI-powered search will reduce query failures to <5% while maintaining sub-250ms latency.
+Current keyword-based search fails on 23% of queries due to typos, synonyms, and semantic variations ("runing shoes," "sneakers for jogging"). This causes cart abandonment and reduces conversion by an estimated 0.8%. Users expect Google-like search intelligence that understands intent, not just exact matches. Our AI-powered search will reduce query failures to <5% while maintaining sub-300ms latency.
 
 ### Happy Path Flow
 
 1. **User Input**: Types ≥3 characters in search bar
 2. **Debounce**: 300ms delay to batch keystrokes
 3. **Cache Check**: Redis lookup for exact query (TTL: popular=24h, long-tail=1h)
-4. **Semantic Processing**:
-
-   * Normalize query (lowercase, remove special chars)
-   * Typo correction via edit distance ("iphon" → "iPhone")
-   * Semantic expansion ("laptop" → includes "notebook, computer")
+4. **Semantic Processing**: Normalize query, typo correction, semantic expansion
 5. **Vector Search**: Query embeddings against pgvector index
 6. **Ranking**: Combine semantic score (0.7) + popularity (0.2) + inventory (0.1)
 7. **Response Format**: Return 5-8 suggestions with product thumbnails
@@ -33,26 +23,29 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 
 * **Source of Truth**: Product catalog API (10k SKUs, updated hourly)
 * **Retrieval Scope**: 100 tokens per product, 384-dim embeddings, similarity ≥0.65, max 8 results
-* **Out-of-Scope Handling**: Category redirects, profanity filter, trending fallback
+* **Max Context**: 800 tokens total
+* **Refuse Outside Scope**: Category redirects, profanity filter, trending fallback
 
 ### Human-in-the-Loop
 
-* Escalation triggers: confidence <0.3, zero results, 5+ failures in session, negative feedback
-* Review by merchandising team weekly, adjustments applied
+* **Escalation Triggers**: confidence <0.3, zero results, 5+ failures in session, negative feedback
+* **UI Surface**: "No results found" message with contact support option
+* **Reviewer**: Merchandising team
+* **SLA**: Weekly review and adjustments applied within 48 hours
 
 ### Latency Budget
 
-| Component           | Budget          |
-| ------------------- | --------------- |
-| Debounce            | 300ms           |
-| Network             | 20ms            |
-| Cache lookup        | 30ms            |
-| Semantic processing | 50ms            |
-| Vector search       | 100ms           |
-| Ranking             | 30ms            |
-| Response formatting | 15ms            |
-| Network return      | 5ms             |
-| **Total** | **250ms (p95)** |
+| Component           | Budget   |
+| ------------------- | -------- |
+| Cache lookup        | 30ms     |
+| Semantic processing | 50ms     |
+| Vector search       | 100ms    |
+| Ranking             | 30ms     |
+| Response formatting | 15ms     |
+| Network return      | 25ms     |
+| **Total**           | **250ms (p95)** |
+
+**Cache Strategy**: Redis with 70% hit rate, popular queries cached 24h, long-tail 1h
 
 ### Error & Fallback Behavior
 
@@ -63,7 +56,9 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 
 ### PII Handling
 
-* Strip emails/phones, anonymize sessions, retain logs 30 days, GDPR deletion supported
+* **What Leaves App**: Anonymized search queries only
+* **Redaction Rules**: Strip emails/phones from queries
+* **Logging Policy**: Retain logs 30 days, GDPR deletion supported
 
 ### Success Metrics
 
@@ -71,103 +66,78 @@ Current keyword-based search fails on 23% of queries due to typos, synonyms, and
 * **Product Metric 2**: Query Success Rate = Successful searches ÷ Total searches (Target >95%)
 * **Business Metric**: Search-to-Cart Rate = Add-to-cart ÷ Search sessions (Target +15%)
 
+### Feasibility Note
+
+Product catalog API already exists with 10k SKUs updated hourly. Redis and pgvector are deployed in current infrastructure. Will use sentence-transformers library for embeddings generation. Next prototype step: Build embedding pipeline for top 500 SKUs and test semantic similarity scoring with sample queries to validate retrieval quality before full rollout.
+
 ---
 
 ## 2. AI Support Assistant
 
 ### Problem Statement
 
-Support tickets average 4-hour response time with 60% being repetitive queries. Human agents handle 1,000 tickets daily at $5/ticket cost. The AI assistant will resolve 70% instantly, reducing costs by $3,500/day and improving CSAT.
+Support tickets average 4-hour response time with 60% being repetitive queries about order status, return policies, and product information. Human agents handle 1,000 tickets daily at $5/ticket cost. The AI assistant will resolve 70% of queries instantly, reducing operational costs by $3,500/day while improving customer satisfaction through immediate responses.
 
 ### Happy Path Flow
 
-1. User opens chat widget
-2. Intent classified (order, policy, product, other)
-3. Redis cache check
-4. Context retrieval: FAQ embeddings, Order API, Product catalog
-5. GPT-4o-mini generates response with context
-6. Confidence check (threshold 0.8)
-7. Response streamed to user
-8. Feedback prompt (thumbs up/down)
-9. Conversation logged
-10. Session context kept 30 min
+1. **User Opens Chat**: Widget loads on support page
+2. **Intent Classification**: Classify query (order, policy, product, other)
+3. **Cache Check**: Redis lookup for similar queries
+4. **Context Retrieval**: Fetch relevant FAQ, order data, product info
+5. **Response Generation**: GPT-4o-mini generates contextual response
+6. **Confidence Check**: Validate response confidence (threshold 0.8)
+7. **Stream Response**: Real-time response delivery to user
+8. **Feedback Collection**: Thumbs up/down prompt
+9. **Conversation Logging**: Store interaction for improvement
+10. **Session Management**: Maintain context for 30 minutes
 
 ### Grounding & Guardrails
 
-* **Source of Truth**: FAQ markdown, Order API, Product catalog
-* **Refusals**: Legal, medical, pricing, sensitive account changes → escalate
+* **Source of Truth**: FAQ markdown files, Order Status API, Product Catalog API
+* **Retrieval Scope**: Max 5 FAQ entries, order details, 3 related products per query
+* **Max Context**: 2000 tokens total input to model
+* **Refuse Outside Scope**: Legal advice, medical questions, pricing changes, account modifications → escalate immediately
 
 ### Human-in-the-Loop
 
-* Escalate if confidence <0.8, flagged keywords, anger/distress detected, high-value transactions, or explicit human request
-* Agent handoff preserves context
+* **Escalation Triggers**: confidence <0.8, flagged keywords, anger/distress detected, high-value transactions, explicit human request
+* **UI Surface**: "Connecting you to agent" message with estimated wait time
+* **Reviewer**: Customer support manager
+* **SLA**: Human agent response within 2 minutes of escalation
 
 ### Latency Budget
 
-| Component             | Budget           |
-| --------------------- | ---------------- |
-| Message receive       | 10ms             |
-| Intent classification | 50ms             |
-| Cache lookup          | 50ms             |
-| Context retrieval     | 200ms            |
-| Model inference       | 200ms            |
-| Formatting            | 50ms             |
-| Scoring               | 50ms             |
-| Delivery              | 40ms             |
-| Logging               | 100ms            |
-| **Total** | **800ms (p95)** |
+| Component             | Budget  |
+| --------------------- | ------- |
+| Intent classification | 50ms    |
+| Cache lookup          | 50ms    |
+| Context retrieval     | 200ms   |
+| Model inference       | 400ms   |
+| Response formatting   | 50ms    |
+| Streaming delivery    | 50ms    |
+| **Total**             | **800ms (p95)** |
+
+**Cache Strategy**: Redis with 30% hit rate, FAQ responses cached 4h, order-specific 30min
 
 ### Error & Fallback Behavior
 
-* Timeout → template response + escalate
-* API unreachable → cached/general answer
-* High load → queue with ETA
-* Context fail → immediate escalation
-
-### Error Investigation Process
-
-To ensure continuous improvement, every error or escalation will be investigated using a structured process:
-
-1. **Log Capture**: Record full details of the failed request (timestamp, query, context retrieved, system response).
-2. **Root Cause Analysis**: Identify if the error was due to missing data, ambiguous intent, API failure, or model misinterpretation.
-3. **Classification**: Tag errors by type (data gap, infrastructure, model, UX).
-4. **Remediation Plan**: Propose fixes such as updating FAQ data, improving intent classification, adding API retries, or refining model prompts.
-5. **Tracking**: Maintain an error backlog with priority and ownership.
-6. **Review Cycle**: Weekly triage meetings to review patterns, assign tasks, and measure error reduction over time.
+* Timeout → template response "Let me connect you with an agent"
+* API unreachable → cached/general answer with escalation
+* High load → queue message with estimated wait time
+* Context retrieval failure → immediate escalation
 
 ### PII Handling
 
-* Mask order IDs/names, encrypt at rest, retain 60 days then anonymize, GDPR-compliant
+* **What Leaves App**: Order IDs and masked customer names only
+* **Redaction Rules**: Mask full names, emails, phone numbers, addresses
+* **Logging Policy**: Encrypt conversations at rest, retain 60 days, GDPR-compliant deletion
 
 ### Success Metrics
 
 * **Product Metric 1**: Resolution Rate = AI resolved ÷ Total queries (Target 70%)
 * **Product Metric 2**: Avg Handle Time = Total handling time ÷ Conversations (Target <90s)
-* **Business Metric**: Cost per Resolution = Total cost ÷ AI resolutions (Target <$0.50)
+* **Business Metric**: Cost per Resolution = Total AI cost ÷ AI resolutions (Target <$0.50)
 
----
+### Feasibility Note
 
-## Implementation Roadmap
-
-* **Week 1**: Embedding pipeline, Redis, telemetry
-* **Week 2**: Deploy Smart Search (10%), Support Assistant shadow mode
-* **Week 3**: Tune parameters, add caching, fallback mechanisms
-* **Week 4**: Scale to 50%, anomaly alerts, handoff docs
-
----
-
-## Risk Mitigation
-
-| Risk           | Probability | Impact | Mitigation                   |
-| -------------- | ----------- | ------ | ---------------------------- |
-| Hallucination  | Medium      | High   | Strict grounding, thresholds |
-| Latency spikes | Low         | Medium | Caching, fallbacks           |
-| Cost overrun   | Medium      | Medium | Usage caps, budget alerts    |
-| Poor quality   | Low         | High   | Human review, monitoring     |
-
----
-
-## Monitoring & Alerting
-
-* **Dashboards**: Latency, errors, query volume, cost vs budget, CTR/CSAT
-* **Alerts**: p95 latency >target, error >2%, cost >80% budget, CSAT <3.5
+FAQ markdown documentation exists with 200+ entries covering common queries. Order Status API is production-ready returning JSON with order details. GPT-4o-mini available via Azure OpenAI with established billing. Next prototype step: Build intent classifier using existing support ticket categories, then test FAQ retrieval accuracy with 50 sample queries to validate response quality and grounding effectiveness.
