@@ -1,70 +1,103 @@
 # ShopLite RFC
 
 ## Overview
-ShopLite is a modern e-commerce platform built for mid-market retailers seeking rapid deployment with enterprise-grade capabilities. Our mission is to deliver a complete, customizable solution that launches in weeks, not months, while remaining scalable for long-term growth.
+ShopLite is a modern e-commerce platform engineered for mid-market retailers seeking enterprise-grade capabilities with rapid deployment. Our **AI-first approach** delivers measurable business impact through intelligent product discovery and automated customer support, launching production-ready in weeks, not months.
 
-In this RFC, we outline our **AI-first sprint** focused on enhancing product discovery and customer support through **Smart Search Suggestions** and an **AI Support Assistant**.
+---
+
+## Mission Statement
+Democratize enterprise e-commerce by providing a **complete, customizable, and AI-enhanced platform** that scales from startup to enterprise. ShopLite reduces time-to-market by **75%** while maintaining **operational excellence, security, and long-term scalability**.
 
 ---
 
 ## Core Architecture
-- **Frontend:** Next.js with Tailwind CSS for responsive design  
-- **Backend:** Node.js API with Express framework  
-- **Database:** PostgreSQL with Redis caching layer (vector search via pgvector)  
-- **Payments:** Stripe integration with multiple payment methods  
-- **Deployment:** Docker containers on AWS with CDN delivery  
-- **AI Stack:** GPT-4o-mini with embeddings, Redis cache, pgvector for semantic retrieval  
+
+### Technology Stack
+- **Frontend:** Next.js 14 with Tailwind CSS, React Server Components  
+- **Backend:** Node.js with Express REST APIs  
+- **Database:** PostgreSQL (structured data) with Redis caching + pgvector for semantic search  
+- **Payments:** Stripe multi-method integration (cards, wallets, BNPL)  
+- **Deployment:** Docker containers orchestrated via AWS ECS, CloudFront CDN delivery  
+- **AI Layer:** GPT-4o-mini inference with Redis cache + semantic deduplication  
+
+### Key Architectural Principles
+- **Modularity:** Decoupled services for search, checkout, support, and admin  
+- **Resilience:** Graceful degradation with keyword fallback and human escalation  
+- **Scalability:** Horizontal scaling for 100k+ concurrent users  
+- **Observability:** Metrics, logs, and alerts integrated into Grafana/Prometheus stack  
+- **Compliance:** PCI DSS, GDPR, and SOC 2 readiness  
 
 ---
 
 ## Key Features
 - Product catalog management with unlimited SKUs  
-- Order management and fulfillment workflows  
-- Customer accounts and authentication  
-- Administrative dashboard and analytics  
-- Mobile-responsive, SEO-optimized storefront  
-- **AI-enhanced search and support (Sprint 1 focus)**  
+- Advanced order management & fulfillment workflows  
+- Customer accounts with secure authentication  
+- Administrative dashboard with real-time analytics  
+- Mobile-first responsive storefront  
+- SEO optimization & performance monitoring  
+- **AI-enabled Smart Search Suggestions** (Sprint 1)  
+- **AI Support Assistant** (Sprint 1)  
 
 ---
 
 ## Technical Specifications
-- **Performance:** Sub-2s page load, AI latency targets ≤250ms (search), ≤1000ms (support)  
-- **Security:** PCI DSS compliance, encrypted data in transit/at rest, PII masking in AI pipelines  
-- **Scalability:** Horizontal scaling for 100k+ concurrent users, Redis + CDN for global caching  
-- **Integrations:** REST APIs for inventory, shipping, accounting, and order status  
+- **Performance:** Sub-2s page load; AI latency ≤250ms (search), ≤1000ms (support)  
+- **Security:** Encrypted data in transit & at rest; PII masking in AI pipelines  
+- **Availability:** 99.9% uptime SLA with active-active failover  
+- **Integrations:** REST APIs for inventory, shipping, and accounting  
+- **Monitoring:** p95 latency tracking, cache hit rate >70%, error rate <1%  
 
 ---
 
-## AI Touchpoints
+## AI Touchpoints (Sprint 1)
 1. **Smart Search Suggestions**  
-   - Typo- and semantic-aware product discovery  
-   - Vector DB search with Redis caching  
+   - Semantic + typo-tolerant product search  
+   - Redis caching + vector DB (pgvector)  
    - Fallback: keyword search  
-   - Metrics: CTR, search-to-cart rate, conversion uplift  
+   - Metrics: CTR, query-to-purchase rate, abandonment reduction  
 
 2. **AI Support Assistant**  
-   - Answers FAQs and order-status queries instantly  
-   - Integrates with order-status API + FAQ markdown  
+   - Answers FAQs + order-status queries instantly  
+   - FAQ embeddings + order API retrieval  
    - Fallback: escalation to human agent  
-   - Metrics: Resolution rate, CSAT, ticket reduction  
+   - Metrics: resolution rate, CSAT, ticket deflection  
 
-Full details in: [AI Capability Map](/docs/ai-first/ai-capability-map.md), [Touchpoints](/docs/ai-first/touchpoints.md), [Cost Model](/docs/ai-first/cost-model.md).
+(Full detail: [AI Capability Map](/docs/ai-first/ai-capability-map.md), [Touchpoints](/docs/ai-first/touchpoints.md), [Cost Model](/docs/ai-first/cost-model.md))  
 
 ---
 
 ## Implementation Timeline
 - **Phase 1 (8 weeks):** Core platform delivery  
-- **Phase 2 (4 weeks):** Advanced features & integrations  
+- **Phase 2 (4 weeks):** Advanced features & 3rd-party integrations  
 - **Phase 3 (4 weeks):** AI-first sprint (search + support)  
 - **Phase 4 (2 weeks):** Go-live, monitoring, and QA  
 
 ---
 
 ## Success Metrics
-- **Conversion rate:** >2.5% baseline, uplift from AI search  
-- **Average order value:** +15% with improved discovery  
-- **Support efficiency:** ≥40% reduction in tickets via automation  
-- **Platform deployment:** <3 weeks for new clients  
-- **AI Cost Efficiency:** <$1,000/day at current scale, ROI positive  
+- **Conversion Rate:** Baseline 2.0% → Target 2.5%+  
+- **Average Order Value:** +15% through improved discovery  
+- **Support Efficiency:** ≥40% reduction in ticket volume  
+- **Deployment Velocity:** <3 weeks for new client rollouts  
+- **AI Cost Efficiency:** <$1,000/day at current scale, ROI positive from Day 1  
+
+---
+
+## Risk Management
+- **Latency spikes:** Mitigated via Redis caching, rate limiting  
+- **Model hallucinations:** Strict grounding in catalog, FAQ, APIs  
+- **Cost overrun:** Daily budget alerts, semantic deduplication, hybrid model routing  
+- **Data privacy:** GDPR-compliant anonymization & retention policies  
+- **System resilience:** Automatic failover + clear fallbacks (keyword search, human escalation)  
+
+---
+
+## Strategic Outlook
+Sprint 1 establishes the **foundation of AI in ShopLite**.  
+- Near-term (Sprint 2): Review Summarization, Dynamic Descriptions  
+- Long-term (Q2 2025): Visual Search, Price Optimization, Personalized Recommendations  
+
+This phased approach ensures **immediate ROI** while paving the way for **AI-driven differentiation** at enterprise scale.
 
 ---
