@@ -57,7 +57,7 @@ Democratize enterprise e-commerce by providing a **complete, customizable, and A
 1. **Smart Search Suggestions** - Semantic + typo-tolerant product search  
 2. **AI Support Assistant** - Answers FAQs + order-status queries instantly  
 
-(Full detail: [AI Capability Map](docs/ai-first/ai-capability-map.md))
+(Full detail: [AI Capability Map](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/ai-capability-map.md))
 
 ---
 
@@ -93,3 +93,4 @@ Sprint 1 establishes the **foundation of AI in ShopLite**.
 - Long-term (Q2 2025): Visual Search, Price Optimization, Personalized Recommendations  
 
 This phased approach ensures **immediate ROI** while paving the way for **AI-driven differentiation** at enterprise scale.
+
