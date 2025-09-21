@@ -66,7 +66,7 @@ Democratize enterprise e-commerce by providing a **complete, customizable, and A
    - Fallback: escalation to human agent  
    - Metrics: resolution rate, CSAT, ticket deflection  
 
-(Full detail: [AI Capability Map](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/ai-capability-map.md), [Touchpoints](/docs/ai-first/touchpoints.md), [Cost Model](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/cost-model.md))  
+(Full detail: [AI Capability Map](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/ai-capability-map.md), [Touchpoints](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/touchpoints.md), [Cost Model](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/cost-model.md))  
 
 ---
 
@@ -104,6 +104,7 @@ Sprint 1 establishes the **foundation of AI in ShopLite**.
 This phased approach ensures **immediate ROI** while paving the way for **AI-driven differentiation** at enterprise scale.
 
 ---
+
 
 
 
