@@ -1,6 +1,6 @@
 # Touchpoint Specifications – ShopLite
 
-**Probe Documentation:** [See AI Support Assistant Simulation Log](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/probe.png)
+**Probe Documentation:** [See AI Support Assistant Simulation Log](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/probe/simulation.png)
 
 AI Support Assistant Simulation
 
