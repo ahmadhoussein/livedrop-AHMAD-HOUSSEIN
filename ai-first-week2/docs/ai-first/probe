@@ -1,1 +1,9 @@
+The screenshot provides a clear simulation of the AI Support Assistant's functionality within the ShopLite e-commerce platform. It demonstrates the system's ability to handle user queries by following a three-step process:
 
+Context Retrieval: The system first performs a semantic lookup to retrieve relevant information from a knowledge base.
+
+Model Inference: It then uses this context to generate a precise and helpful response.
+
+Fallback Behavior: The simulation also shows how the system correctly identifies queries that are out of scope or lack sufficient information, and defaults to a clear fallback message, offering to escalate the user to a human agent.
+
+This log confirms that the AI Support Assistant operates as designed, ensuring both a high resolution rate for common queries and a reliable, safe fallback for complex issues.
