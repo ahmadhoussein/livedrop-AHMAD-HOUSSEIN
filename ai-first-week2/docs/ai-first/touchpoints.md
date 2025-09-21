@@ -2,6 +2,19 @@
 
 **Probe Documentation:** [See AI Support Assistant Simulation Log](https://github.com/ahmadhoussein/livedrop-AHMAD-HOUSSEIN/blob/main/ai-first-week2/docs/ai-first/probe.png)
 
+AI Support Assistant Simulation
+
+This screenshot provides a log of the **AI Support Assistant** in action, demonstrating both a successful interaction and a planned fallback behavior.
+
+1.  **Happy Path (Successful Query):**
+    * **User Input:** The user asks a direct question that the system is designed to handle: "What is my order status?".
+    * **System Response:** The assistant successfully retrieves the relevant information from its knowledge base and provides a specific, helpful answer: "Your order #12345 is currently in transit...". This proves the system can accurately handle in-scope queries.
+
+2.  **Fallback Behavior (Out-of-Scope Queries):**
+    * **User Input:** The user asks three different questions that are not in the system's knowledge base: "I need to return a shirt.", "What's your return policy?", and "Can I get a refund for my purchase?".
+    * **System Response:** The system correctly identifies that it cannot find a relevant answer for any of these queries. Instead of providing a poor or hallucinated response, it executes its fallback plan. It consistently replies with a pre-defined message: "I'm sorry, I cannot find an answer to that question in my knowledge base. Would you like me to connect you with a human agent?".
+
+This simulation log serves as a crucial piece of **feasibility documentation**, confirming that the AI assistant can handle both expected tasks and gracefully fail on out-of-scope requests. It ensures a reliable and safe user experience.
 ## 1. Smart Search Suggestions
 
 ### Problem Statement
