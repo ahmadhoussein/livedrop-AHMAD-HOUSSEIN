@@ -9,20 +9,21 @@ Users abandon searches if results are irrelevant or fail on typos (“runing sho
 
 ### Happy Path
 1. User types ≥3 chars in search bar.
-2. Query debounced (300ms) then sent to API.
-3. Cache checked for common queries.
-4. If miss, AI embedding search runs against product catalog.
-5. 5–8 suggestions ranked by relevance + popularity.
-6. Dropdown shows corrected terms & product matches.
-7. User clicks → redirected to product page.
-8. Event logged for analytics.
-9. Cache updated for reuse.
+2. Query debounced (300ms) then sent to search API.
+3. Redis cache checked for common queries (TTL: popular = 24h, long-tail = 1h).
+4. If miss, semantic deduplication normalizes queries (e.g., “runing shoes” → “running shoes”).
+5. AI embedding search runs against product catalog in vector DB (pgvector for low latency).
+6. 5–8 suggestions ranked by relevance + popularity.
+7. Dropdown shows corrected terms & product matches.
+8. User clicks → redirected to product page.
+9. Event logged for analytics.
+10. Cache updated for reuse.
 
 ### Grounding & Guardrails
 - Source: product catalog (10k SKUs).
 - Retrieval scope: active, in-stock products only.
-- Max context: ~200 tokens per product.
-- Out-of-scope (e.g., “mortgage rates”) → fallback to keyword search.
+- Max context: titles + attributes ≤100 tokens each.
+- Out-of-scope → fallback to keyword search.
 
 ### Human-in-the-loop
 - Trigger: query confidence <0.3 or zero results.
@@ -33,13 +34,14 @@ Users abandon searches if results are irrelevant or fail on typos (“runing sho
 ### Latency Budget
 - Debounce: 300ms
 - Cache lookup: 50ms
-- Model retrieval + inference: 150ms
-- Ranking & return: 50ms
+- Semantic dedup + vector retrieval: 120ms
+- Model rerank: 50ms
+- Rendering: 30ms
 - **Total ≤250ms (p95)**
 
 ### Error & Fallback
-- Model/API fail → default keyword search.
-- Network fail → cached results or trending searches.
+- Model/API fail → keyword search.
+- Network fail → cached results or trending products.
 
 ### PII Handling
 - Only query text sent, no IDs.
@@ -48,11 +50,12 @@ Users abandon searches if results are irrelevant or fail on typos (“runing sho
 
 ### Success Metrics
 - CTR = Clicked suggestions / Suggestions shown.
-- Search-to-cart = Sessions with add-to-cart after search / Search sessions.
-- Business metric: Conversion uplift (%) vs baseline search.
+- Search-to-cart rate = Sessions with add-to-cart / Search sessions.
+- AI accuracy = Precision & recall of suggestions vs ground truth.
+- Business metric: Conversion uplift (%) vs baseline.
 
 ### Feasibility Note
-Product catalog API exists. Use vector search (e.g., FAISS/ANN). Next step: prototype embeddings on 100 SKUs, test typo tolerance, measure latency.
+Catalog API + metadata ready. Vector DB (pgvector) feasible with low-latency Postgres integration. Next step: build embeddings for 500 SKUs, run typo simulation (“iphon” → “iPhone”), benchmark <250ms latency.
 
 ---
 
@@ -63,49 +66,50 @@ Product catalog API exists. Use vector search (e.g., FAISS/ANN). Next step: prot
 
 ### Happy Path
 1. User opens chat widget.
-2. Asks question (“Where is my order?”).
-3. Cache checked for FAQ.
-4. If miss, embed + retrieve from FAQ.
-5. If order-related, call order-status API.
-6. AI generates clear response.
+2. Asks: “Where is my order?”.
+3. Redis cache checked for FAQ (TTL: 4h).
+4. If miss, embed + retrieve FAQ with vector DB.
+5. If order-related, call order-status API by order ID.
+6. AI generates grounded response with retrieval context.
 7. Confidence <0.8 → escalate to human.
-8. Reply delivered in ≤1000ms.
-9. Session logged for QA.
+8. Response delivered in ≤1000ms.
+9. Conversation + CSAT logged for QA.
 
 ### Grounding & Guardrails
 - Sources: FAQ markdown + order-status API.
 - Retrieval scope: internal docs only.
 - Max context: ≤1000 tokens.
-- Out-of-scope → “Sorry, can’t answer” + escalate.
+- Refuse scope: out-of-policy → escalate.
 
 ### Human-in-the-loop
 - Triggers: low confidence (<0.8), refunds >$100, complaints.
-- UI: “Talk to human” always available.
+- UI: “Talk to human” always visible.
 - Reviewer: senior agent.
-- SLA: human response ≤10min in hours.
+- SLA: response ≤10min.
 
 ### Latency Budget
-- Cache: 50ms
+- Cache lookup: 50ms
 - Retrieval: 200ms
 - API call: 300ms
-- Model inference: 400ms
-- Formatting: 50ms
+- Model inference: 350ms
+- Formatting: 100ms
 - **Total ≤1000ms (p95)**
 
 ### Error & Fallback
-- Model fails → template: “Contact support.”
-- API fails → general policy info + escalate.
+- Model fail → template “Please contact support.”
+- API fail → general policy answer + escalate.
+- Hallucination prevention → always show source (FAQ snippet, order ID from API).
 
 ### PII Handling
-- Mask order IDs before model.
+- Mask order IDs before sending to model.
 - Strip names, addresses, CC numbers.
-- Logs encrypted, kept ≤60 days.
+- Logs encrypted, retained ≤60 days.
 
 ### Success Metrics
 - Resolution rate = AI resolved / Total queries.
 - Avg response time (ms).
-- Business metric: (Baseline tickets – Post-AI tickets)/Baseline.
+- CSAT (1–5 rating after chat).
+- Business metric: Support ticket reduction = (Baseline – Post-AI)/Baseline.
 
 ### Feasibility Note
-FAQ exists. Order-status API live. Next step: RAG pipeline with embeddings. Test 50 sample queries for accuracy + latency.
-
+FAQ file + order-status API already exist. RAG pipeline with embeddings is straightforward. Next step: run 50 sample queries, measure accuracy, ensure hallucinations <2%.
