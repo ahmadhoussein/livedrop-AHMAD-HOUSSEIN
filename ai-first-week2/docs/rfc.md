@@ -1,5 +1,8 @@
 # ShopLite RFC
 
+<img width="3840" height="3296" alt="diagram" src="https://github.com/user-attachments/assets/9d993cc9-c9b6-420b-87ff-359189e86b17" />
+
+
 ## Overview
 ShopLite is a modern e-commerce platform engineered for mid-market retailers seeking enterprise-grade capabilities with rapid deployment. Our **AI-first approach** delivers measurable business impact through intelligent product discovery and automated customer support, launching production-ready in weeks, not months.
 
@@ -101,3 +104,4 @@ Sprint 1 establishes the **foundation of AI in ShopLite**.
 This phased approach ensures **immediate ROI** while paving the way for **AI-driven differentiation** at enterprise scale.
 
 ---
+
