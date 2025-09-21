@@ -10,22 +10,16 @@ This document outlines potential AI capabilities for ShopLite's e-commerce platf
 
 | Capability                   | Intent (user)                                     | Inputs (this sprint)                      | Risk 1–5 | p95 ms | Est. cost/action | Fallback                | Data Readiness           | Selected |
 | ---------------------------- | ------------------------------------------------- | ----------------------------------------- | -------- | ------ | ---------------- | ----------------------- | ------------------------ | :------: |
-| **Smart Search Suggestions** | Find products faster with typo/semantic awareness | Product catalog (\~10k SKUs), search logs | 2        | 250    | \$0.053          | Basic keyword search    | ✅ Catalog API ready      |     ✅    |
-| **AI Support Assistant**     | Get instant help with orders & policies           | FAQ markdown, order-status API            | 3        | 800\*  | \$0.210          | Escalate to human agent | ✅ FAQ + API exist        |     ✅    |
-| Dynamic Descriptions         | Auto-generate compelling product copy             | Product specs, brand guidelines           | 4        | 2000   | \$0.045          | Static templates        | ⚠️ Specs need structure  |     ❌    |
-| Visual Search                | Find products using image uploads                 | Product images, visual embeddings         | 4        | 3000   | \$0.082          | Text search only        | ❌ No image pipeline      |     ❌    |
-| Price Optimization           | Suggest competitive prices dynamically            | Sales history, competitor data            | 5        | 5000   | \$0.120          | Manual pricing rules    | ❌ Data fragmented        |     ❌    |
-| Review Summarization         | Condense reviews into key insights                | Customer reviews dataset                  | 3        | 1500   | \$0.025          | Show raw reviews        | ⚠️ Reviews noisy         |     ❌    |
-| Personalized Recommendations | Surface relevant products per user                | User behavior, purchase history           | 3        | 500    | \$0.035          | Trending products       | ❌ GDPR compliance needed |     ❌    |
-| Inventory Forecasting        | Predict stock needs using ML                      | Historical sales, seasonal data           | 4        | 8000   | \$0.095          | Manual reorder points   | ⚠️ 6 months data only    |     ❌    |
+| **Smart Search Suggestions** | Find products faster with typo/semantic awareness | Product catalog (~10k SKUs), search logs  | 2        | 250    | $0.053           | Basic keyword search    | ✅ Catalog API ready      |     ✅    |
+| **AI Support Assistant** | Get instant help with orders & policies           | FAQ markdown, order-status API            | 3        | 800* | $0.210           | Escalate to human agent | ✅ FAQ + API exist        |     ✅    |
+| Dynamic Descriptions         | Auto-generate compelling product copy             | Product specs, brand guidelines           | 4        | 2000   | $0.045           | Static templates        | ⚠️ Specs need structure  |     ❌    |
+| Visual Search                | Find products using image uploads                 | Product images, visual embeddings         | 4        | 3000   | $0.082           | Text search only        | ❌ No image pipeline      |     ❌    |
+| Price Optimization           | Suggest competitive prices dynamically            | Sales history, competitor data            | 5        | 5000   | $0.120           | Manual pricing rules    | ❌ Data fragmented        |     ❌    |
+| Review Summarization         | Condense reviews into key insights                | Customer reviews dataset                  | 3        | 1500   | $0.025           | Show raw reviews        | ⚠️ Reviews noisy         |     ❌    |
+| Personalized Recommendations | Surface relevant products per user                | User behavior, purchase history           | 3        | 500    | $0.035           | Trending products       | ❌ GDPR compliance needed |     ❌    |
+| Inventory Forecasting        | Predict stock needs using ML                      | Historical sales, seasonal data           | 4        | 8000   | $0.095           | Manual reorder points   | ⚠️ 6 months data only    |     ❌    |
 
-> \*Note: Target latency for the **AI Support Assistant** is set to \~800ms (p95). While this is higher than Smart Search Suggestions (250ms), it remains within "sub-second" response time and is acceptable due to external API calls (order-status) and FAQ embedding retrieval. This aligns with the RFC, which specifies ≤1000ms for support use cases.
-
-### Risk Classification
-
-* **1-2**: Low risk - Proven patterns, clear fallbacks
-* **3**: Medium risk - Some complexity, manageable edge cases
-* **4-5**: High risk - Technical uncertainty, data dependencies
+> *Note: The target latency for the **AI Support Assistant** is set to ~800ms (p95), which is within the RFC's acceptable range of ≤1200ms.
 
 ---
 
@@ -33,7 +27,7 @@ This document outlines potential AI capabilities for ShopLite's e-commerce platf
 
 We selected **Smart Search Suggestions** and **AI Support Assistant** based on three critical factors:
 
-1. **Immediate Business Impact**: Search improvements directly boost conversion rates (estimated +0.5-1.0%), while automated support reduces operational costs by \~40% and improves response times from hours to seconds.
+1. **Immediate Business Impact**: Search improvements directly boost conversion rates (estimated +0.5-1.0%), while automated support reduces operational costs by ~40% and improves response times from hours to seconds.
 
 2. **Technical Readiness**: Both leverage existing, clean data sources (product catalog API, FAQ documentation, order-status API) with no additional data engineering required. Infrastructure components (Redis, pgvector) are already deployed.
 
@@ -65,7 +59,7 @@ These capabilities create a foundation for future AI expansion while delivering 
 
 * Deploy both capabilities to 10% of traffic by Week 3
 * Achieve target latencies (Search <250ms, Support <800ms) at p95
-* Maintain AI costs under \$1,000/day at current scale
+* Maintain AI costs under $1,000/day at current scale
 * Zero critical failures in fallback scenarios
 
 ### Measurement Framework
