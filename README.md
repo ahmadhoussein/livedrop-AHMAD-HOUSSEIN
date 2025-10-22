@@ -1,287 +1,242 @@
-# ShopSmart - Week 5 Final MVP 🛒
+# Ahmad Store - Full Stack E-commerce Platform
 
-## Overview
-Complete e-commerce platform with real-time order tracking, intelligent support assistant, and admin dashboard.
+A modern, full-stack e-commerce platform with AI-powered customer support assistant.
 
-## 🎯 Features
-- ✅ RESTful API with MongoDB-style aggregation
-- ✅ Server-Sent Events (SSE) for real-time order tracking
-- ✅ Intelligent Support Assistant with 7 intent detection
-- ✅ Function Registry for assistant actions
-- ✅ Citation Validation for policy responses
-- ✅ Admin Dashboard with business metrics
-- ✅ Complete test coverage
+## 🚀 Features
 
-## 🧪 Test User Account
-**Email:** `demouser@example.com`  
-**Name:** Demo User  
-**Orders:** 3 orders (DELIVERED, SHIPPED, PENDING)
+### Frontend (React + TypeScript)
+- ⚡ Fast and responsive UI built with React and TypeScript
+- 🎨 Modern design with TailwindCSS
+- 🛒 Complete shopping cart functionality
+- 📦 Real-time order tracking with SSE
+- 🔍 Advanced product search and filtering
+- 📱 Mobile-responsive design
+- 🤖 AI-powered support assistant
 
-### How to Test
-1. Visit http://localhost:5173
-2. Browse products and add to cart
-3. At checkout, enter email: `demouser@example.com`
-4. No password required (Week 5 requirement)
-5. View your orders and track their status
+### Backend (Node.js + Express + MongoDB)
+- 🗄️ MongoDB database with optimized queries
+- 🔐 Secure API endpoints with CORS protection
+- 📊 Business analytics and dashboard
+- 🤖 AI assistant with bilingual support (English/Arabic)
+- 📚 Knowledge base with citation validation
+- 🔄 Real-time order status updates via SSE
+- 🌐 RESTful API architecture
 
-## 🚀 Quick Start
+### AI Assistant Features
+- 🧠 Intent classification (7 intents)
+- 📖 Knowledge base with 17+ policies
+- 🌍 Bilingual support (English & Arabic)
+- 📝 Citation validation for grounded responses
+- 🔗 Function registry for order status, product search
+- 🤗 Hugging Face API integration (optional)
+
+## 📁 Project Structure
+
+```
+ahmadStore-main/
+├── apps/
+│   ├── api/                    # Backend API (Node.js + Express)
+│   │   ├── src/
+│   │   │   ├── assistant/      # AI Assistant engine
+│   │   │   ├── routes/         # API routes
+│   │   │   ├── services/       # Business logic
+│   │   │   └── server.js       # Main server
+│   │   └── package.json
+│   │
+│   ├── storefront/             # Frontend (React + TypeScript)
+│   │   ├── src/
+│   │   │   ├── components/     # React components
+│   │   │   ├── pages/          # Page components
+│   │   │   ├── lib/            # Utilities & API client
+│   │   │   └── assistant/      # Assistant engine (frontend)
+│   │   └── package.json
+│   │
+│   └── ai-assistant/           # Optional LLM service (Python)
+│       └── main.py
+│
+├── docs/                       # Documentation & knowledge base
+│   ├── ground-truth.json       # Knowledge base (17 policies)
+│   └── prompts.yaml            # Assistant configuration
+│
+└── README.md
+```
+
+## 🛠️ Installation
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
-- MongoDB Atlas account (optional - file storage included)
+- Node.js 20+
+- MongoDB Atlas account (or local MongoDB)
+- Git
 
-### Local Development
+### Backend Setup
 
-#### 1. Backend API
 ```bash
 cd apps/api
 npm install
-npm run start:dynamic  # File-based storage
-# OR
-npm run start:demo     # In-memory storage
-```
-API will run on http://localhost:3001
 
-#### 2. Frontend
+# Create config.env file
+cp env.example config.env
+
+# Edit config.env with your MongoDB URI
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/ahmadstore
+# NODE_ENV=development
+# PORT=3001
+
+# Start the server
+npm start
+
+# Or for development with auto-reload
+npm run dev
+```
+
+### Frontend Setup
+
 ```bash
 cd apps/storefront
 npm install
+
+# Create .env file
+echo "VITE_API_URL=http://localhost:3001" > .env
+
+# Start development server
 npm run dev
-```
-Frontend will run on http://localhost:5173
 
-### Database Seeding
-```bash
-cd apps/api
-npm run seed
-```
-Seeds:
-- 25 products across multiple categories
-- 12 customers (including test user)
-- 18 orders with various statuses
-
-## 📁 Project Structure
-```
-/apps/api/
-  src/
-    server-dynamic.js      # Main server with file persistence
-    sse/order-status.js    # SSE with auto-simulation
-    assistant/
-      intent-classifier.js # 7 intents detection
-      function-registry.js # Callable functions
-      citation-validator.js # Policy citation validation
-      engine.js           # Assistant orchestration
-      
-/apps/storefront/
-  src/
-    pages/
-      admin-dashboard.tsx  # Business metrics
-      order-status-sse.tsx # Real-time tracking
-    lib/
-      api.ts              # API client
-      sse-client.ts       # SSE handler
-
-/docs/
-  prompts.yaml            # Assistant identity
-  ground-truth.json       # 15 policy documents
-  deployment-guide.md     # Complete deployment steps
-
-/tests/
-  api.test.js             # API endpoint tests
-  assistant.test.js       # Intent & identity tests
-  integration.test.js     # End-to-end workflows
+# Or build for production
+npm run build
 ```
 
-## 🔑 Key Endpoints
+## 🚀 Deployment
 
-### Customer API (No Auth Required)
-- `GET /api/customers?email=demouser@example.com` - Lookup by email
-- `GET /api/customers/:id` - Get customer details
+### Backend (Render)
+
+1. **Create Web Service on Render.com**
+2. **Configure:**
+   - Root Directory: `apps/api`
+   - Build Command: `npm ci --only=production`
+   - Start Command: `node src/server.js`
+   - Environment Variables:
+     ```
+     NODE_ENV=production
+     NODE_VERSION=20
+     MONGODB_URI=your_mongodb_connection_string
+     CORS_ORIGINS=https://your-frontend-url.com
+     AUTO_SEED=true
+     ```
+
+See `RENDER_DEPLOYMENT.md` for detailed instructions.
+
+### Frontend (Vercel)
+
+1. **Deploy to Vercel**
+2. **Configure:**
+   - Root Directory: `apps/storefront`
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Environment Variable:
+     ```
+     VITE_API_URL=https://your-api-url.onrender.com
+     ```
+
+## 📚 API Endpoints
 
 ### Products
 - `GET /api/products` - List all products
 - `GET /api/products/:id` - Get product details
-- `POST /api/products` - Create product
+- `POST /api/products` - Create product (admin)
+- `PUT /api/products/:id` - Update product (admin)
+- `DELETE /api/products/:id` - Delete product (admin)
 
 ### Orders
-- `POST /api/orders` - Create order
+- `GET /api/orders` - List orders
 - `GET /api/orders/:id` - Get order details
-- `GET /api/orders/:id/stream` - SSE live tracking
-- `GET /api/orders?customerId=:id` - Customer orders
+- `POST /api/orders` - Create order
+- `GET /api/orders/:id/stream` - SSE order status updates
 
-### Analytics (MongoDB-style Aggregation)
-- `GET /api/analytics/daily-revenue?from=&to=` - Revenue aggregation
+### AI Assistant
+- `POST /api/assistant/chat` - Chat with AI assistant
+- `GET /api/assistant/info` - Get assistant capabilities
+- `GET /api/assistant/search/policies` - Search knowledge base
+- `POST /api/assistant/kb/reload` - Reload knowledge base
 
-### Dashboard
-- `GET /api/dashboard/business-metrics` - Revenue, orders
-- `GET /api/dashboard/performance` - System metrics
-- `GET /api/dashboard/assistant-stats` - Assistant analytics
-- `GET /api/dashboard/system-health` - Health check
+### Analytics
+- `GET /api/dashboard/business-metrics` - Business metrics
+- `GET /api/analytics/sales` - Sales analytics
 
-### Assistant
-- `POST /api/assistant/chat` - Chat with assistant
+## 🤖 AI Assistant Configuration
 
-## 🤖 Assistant Features
+The AI assistant supports:
 
-### Supported Intents
-1. `policy_question` - Returns, shipping, warranties
-2. `order_status` - Order tracking queries  
-3. `product_search` - Product searches
-4. `complaint` - Customer complaints
-5. `chitchat` - Greetings, small talk
-6. `off_topic` - Unrelated topics
-7. `violation` - Inappropriate content
+### Intents
+1. **policy_question** - Store policies (returns, shipping, warranty)
+2. **order_status** - Order tracking
+3. **product_search** - Product search
+4. **complaint** - Customer complaints
+5. **chitchat** - Greetings
+6. **off_topic** - Unrelated questions
+7. **violation** - Inappropriate content
 
-### Identity
-- **Name:** Alex
-- **Role:** Customer Support Specialist
-- **Company:** ShopSmart
-- **Never reveals:** AI model identity
+### Environment Variables (Optional)
+```env
+# Hugging Face API (for LLM responses)
+HUGGINGFACE_TOKEN=hf_your_token_here
+HF_MODEL=mistralai/Mistral-7B-Instruct-v0.3
 
-### Functions Available
-- `getOrderStatus(orderId)`
-- `searchProducts(query, limit)`
-- `getCustomerOrders(email)`
-- `getStorePolicy(category)`
-- `checkProductAvailability(productId)`
+# Or use separate LLM service
+LLM_ENDPOINT=https://your-llm-service.onrender.com
+```
 
 ## 🧪 Testing
 
-### Run All Tests
+### Backend Tests
 ```bash
 cd apps/api
 npm test
 ```
 
-### Test Categories
-- **Intent Detection:** All 7 intents with examples
-- **Identity Tests:** Doesn't reveal AI model
-- **Function Calling:** Correct execution
-- **API Tests:** All endpoints
-- **Integration Tests:** Complete workflows
-
-## 📊 SSE Order Tracking
-
-### Auto-Simulation Flow
-1. Connect to `/api/orders/:id/stream`
-2. Receive current status immediately
-3. Auto-progresses every 3-5 seconds:
-   - PENDING → PROCESSING (3s)
-   - PROCESSING → SHIPPED (5s)
-   - SHIPPED → DELIVERED (5s)
-4. Updates database and sends events
-5. Stream closes at DELIVERED
-
-### Test SSE
-1. Create an order
-2. Navigate to http://localhost:5173/order/[ORDER_ID]
-3. Watch real-time status updates
-
-## 🎨 Admin Dashboard
-Visit http://localhost:5173/admin
-
-### Features
-- Total revenue & order count
-- Average order value
-- Revenue charts (7-day trend)
-- Orders by status breakdown
-- Category performance
-- System health monitoring
-- Assistant performance metrics
-
-## 🚢 Deployment
-
-### 📘 Complete Deployment Guide
-See **[Deployment Guide](./docs/deployment-guide.md)** for detailed step-by-step instructions in Arabic and English.
-
-### Quick Deployment Steps:
-
-#### 1. Push to GitHub
+### Frontend Tests
 ```bash
-git add .
-git commit -m "Ready for deployment"
-git push origin main
-```
-
-#### 2. MongoDB Atlas Setup
-1. Create free M0 cluster at https://www.mongodb.com/cloud/atlas
-2. Add database user with read/write permissions
-3. Whitelist 0.0.0.0/0 in Network Access
-4. Copy connection string
-
-#### 3. Deploy Backend on Render
-1. Go to https://render.com
-2. Create new Web Service
-3. Connect GitHub repo: `avesoftwar-rgb/ahmaddd`
-4. Configure:
-   - Root Directory: `apps/api`
-   - Build Command: `npm install --production`
-   - Start Command: `npm start`
-5. Add Environment Variables:
-   ```
-   MONGODB_URI=mongodb+srv://...
-   PORT=3001
-   NODE_ENV=production
-   CORS_ORIGINS=https://your-frontend-url.vercel.app
-   ```
-6. Deploy and copy your backend URL
-
-#### 4. Deploy Frontend on Vercel
-1. Go to https://vercel.com
-2. Import GitHub repo
-3. Configure:
-   - Root Directory: `apps/storefront`
-   - Build Command: `npm run build`
-   - Output Directory: `dist`
-4. Add Environment Variable:
-   ```
-   VITE_API_URL=https://your-backend-url.onrender.com
-   ```
-5. Deploy!
-
-#### 5. Update CORS
-Go back to Render and update `CORS_ORIGINS` with your Vercel URL.
-
-### Using render.yaml
-This project includes a `render.yaml` file for automatic deployment:
-```bash
-# Just push to GitHub and connect in Render Dashboard
-# render.yaml will configure everything automatically
-```
-
-### LLM Endpoint (Optional)
-Add to Week 3 Colab:
-```python
-@app.route('/generate', methods=['POST'])
-def generate():
-    prompt = request.json.get('prompt')
-    response = model.generate(prompt)
-    return jsonify({"text": response})
+cd apps/storefront
+npm test
 ```
 
 ## 📝 Environment Variables
-See `.env.example`:
-```
+
+### Backend (`apps/api/config.env`)
+```env
+MONGODB_URI=mongodb+srv://...
+NODE_ENV=production
 PORT=3001
-MONGODB_URI=mongodb://... (optional)
+CORS_ORIGINS=https://your-frontend.com
+AUTO_SEED=true
+HUGGINGFACE_TOKEN=hf_... (optional)
 LLM_ENDPOINT=https://... (optional)
-NODE_ENV=development
 ```
 
-## 🛡️ Security Notes
-- No authentication required (Week 5 spec)
-- Email-only identification
-- No passwords stored or validated
-- CORS enabled for development
+### Frontend (`apps/storefront/.env`)
+```env
+VITE_API_URL=https://your-api.onrender.com
+```
 
-## 📚 Documentation
-- [Deployment Guide](docs/deployment-guide.md)
-- [Assistant Configuration](docs/prompts.yaml)
-- [Policy Knowledge Base](docs/ground-truth.json)
+## 🔒 Security
 
-## 📧 Support
-Test account issues? Use: `demouser@example.com`
+- CORS protection with configurable origins
+- Input validation on all endpoints
+- MongoDB injection prevention
+- Environment variable protection
+- Secure session handling
 
----
-**Week 5 Final MVP Assignment - Ready for Submission ✅**
+## 📄 License
+
+MIT License - feel free to use this project for learning and commercial purposes.
+
+## 👨‍💻 Author
+
+Ahmad Houssein
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+## ⭐ Show your support
+
+Give a ⭐️ if this project helped you!

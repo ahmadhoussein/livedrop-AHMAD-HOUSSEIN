@@ -135,7 +135,7 @@ export default function ProductAdmin() {
   }
 
   const handleResetData = async () => {
-    if (confirm('⚠️ سيؤدي هذا إلى مسح البيانات وإعادة تعبئتها بـ 30+ منتج تجريبي. هل أنت متأكد؟')) {
+    if (confirm('⚠️ This will clear all data and reset with 30+ demo products. Are you sure?')) {
       try {
         const response = await fetch(`${API_BASE_URL}/api/products/seed`, {
           method: 'POST'
@@ -143,14 +143,14 @@ export default function ProductAdmin() {
         if (response.ok) {
           await loadProducts()
           await loadStats()
-          alert('✅ تمت إعادة التهيئة: تم إدراج 30+ منتج مع صور، وطلبات/عملاء افتراضيين')
+          alert('✅ Reset successful: 30+ products with images, orders, and customers have been inserted')
         } else {
           const text = await response.text().catch(() => '')
-          alert('فشل التهيئة: ' + text)
+          alert('Reset failed: ' + text)
         }
       } catch (error) {
         console.error('Failed to reset data:', error)
-        alert('فشل التهيئة. تحقق من السجل.')
+        alert('Reset failed. Check the console log.')
       }
     }
   }
