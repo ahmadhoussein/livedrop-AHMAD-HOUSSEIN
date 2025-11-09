@@ -462,9 +462,15 @@ async function generateResponse(userInput, intent, functionResults = []) {
       // Use LLM for more natural chitchat responses
       try {
         const lang = synonyms.detectLanguage(userInput);
+        // Handle personality as object or array
+        const personality = config.personality ? 
+          (Array.isArray(config.personality) ? config.personality.join(', ') : 
+           Object.entries(config.personality).filter(([k,v]) => v).map(([k]) => k).join(', ')) : 
+          'friendly, professional';
+        
         const prompt = [
           `You are ${config.name}, a ${config.role} at ${config.company}.`,
-          'Personality: ' + (config.personality || []).join(', '),
+          'Personality: ' + personality,
           '',
           'Respond warmly to the customer greeting. Keep it brief (1-2 sentences).',
           'Invite them to ask about products, orders, or policies.',

@@ -101,7 +101,12 @@ const rawOrigins = (process.env.CORS_ORIGINS || '')
   .split(',')
   .map(o => o.trim())
   .filter(Boolean);
-const defaultOrigins = ['http://localhost:5173'];
+const defaultOrigins = [
+  'http://localhost:5173',
+  'https://livedrop-ahmad-houssein-storefront.vercel.app',
+  'https://livedrop-ahmad-houssein-storefront-ci7t7eo27.vercel.app',
+  'https://*.vercel.app'  // Allow all Vercel preview deployments
+];
 const allowlist = rawOrigins.length ? rawOrigins : defaultOrigins;
 
 function isOriginAllowed(origin, list) {
