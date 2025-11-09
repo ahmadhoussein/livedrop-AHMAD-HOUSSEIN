@@ -627,6 +627,20 @@ router.get('/kb/stats', (req, res) => {
   res.json(citationValidator.getKnowledgeBaseStats());
 });
 
+/**
+ * Diagnostic endpoint to check LLM configuration
+ */
+router.get('/debug/llm-config', (req, res) => {
+  res.json({
+    hasHuggingFaceToken: !!(process.env.HUGGINGFACE_TOKEN || process.env.HF_TOKEN),
+    hasGroqToken: !!process.env.GROQ_API_KEY,
+    hasCustomLLM: !!process.env.LLM_ENDPOINT,
+    hfModel: process.env.HF_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3',
+    groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+    tokenPrefix: process.env.HUGGINGFACE_TOKEN ? process.env.HUGGINGFACE_TOKEN.substring(0, 4) + '...' : 'none'
+  });
+});
+
 // Initialize on module load
 loadConfig();
 loadKnowledgeBase();
