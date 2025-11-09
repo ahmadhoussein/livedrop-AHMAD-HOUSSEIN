@@ -459,11 +459,72 @@ async function generateResponse(userInput, intent, functionResults = []) {
       break;
       
     case INTENTS.CHITCHAT:
-      response.text = `Hello! I'm ${config.name}, your ${config.role} at ${config.company}. I can help with products, orders, and policies. How can I assist you today?`;
+      // Use LLM for more natural chitchat responses
+      try {
+        const lang = synonyms.detectLanguage(userInput);
+        const prompt = [
+          `You are ${config.name}, a ${config.role} at ${config.company}.`,
+          'Personality: ' + (config.personality || []).join(', '),
+          '',
+          'Respond warmly to the customer greeting. Keep it brief (1-2 sentences).',
+          'Invite them to ask about products, orders, or policies.',
+          lang === 'ar' ? 'Respond in Arabic.' : 'Respond in English.',
+          '',
+          `Customer: ${userInput}`,
+          'Your response:'
+        ].join('\n');
+        
+        const llmText = await callLLM(prompt, { maxTokens: 150, temperature: 0.7 });
+        
+        if (llmText && llmText.trim()) {
+          response.text = llmText.trim();
+        } else {
+          // Fallback to template if LLM fails
+          response.text = lang === 'ar'
+            ? `مرحباً! أنا ${config.name}، ${config.role} في ${config.company}. أستطيع مساعدتك في المنتجات والطلبات والسياسات. كيف يمكنني مساعدتك؟`
+            : `Hello! I'm ${config.name}, your ${config.role} at ${config.company}. I can help with products, orders, and policies. How can I assist you today?`;
+        }
+      } catch (err) {
+        console.error('Chitchat LLM error:', err);
+        const lang = synonyms.detectLanguage(userInput);
+        response.text = lang === 'ar'
+          ? `مرحباً! أنا ${config.name}، ${config.role} في ${config.company}. أستطيع مساعدتك في المنتجات والطلبات والسياسات. كيف يمكنني مساعدتك؟`
+          : `Hello! I'm ${config.name}, your ${config.role} at ${config.company}. I can help with products, orders, and policies. How can I assist you today?`;
+      }
       break;
       
     case INTENTS.OFF_TOPIC:
-      response.text = `I appreciate your question, but I'm focused on ${config.company} shopping, orders, and policies. Is there anything related to our store I can help you with today?`;
+      // Use LLM for more natural off-topic redirection
+      try {
+        const lang = synonyms.detectLanguage(userInput);
+        const prompt = [
+          `You are ${config.name}, a ${config.role} at ${config.company}.`,
+          'The customer asked something unrelated to e-commerce (shopping, products, orders, policies).',
+          '',
+          'Politely acknowledge their question but redirect them to topics you can help with.',
+          'Keep it friendly and brief (1-2 sentences).',
+          lang === 'ar' ? 'Respond in Arabic.' : 'Respond in English.',
+          '',
+          `Customer question: ${userInput}`,
+          'Your response:'
+        ].join('\n');
+        
+        const llmText = await callLLM(prompt, { maxTokens: 150, temperature: 0.7 });
+        
+        if (llmText && llmText.trim()) {
+          response.text = llmText.trim();
+        } else {
+          response.text = lang === 'ar'
+            ? `أقدر سؤالك، لكنني متخصص في ${config.company} - المنتجات والطلبات والسياسات. هل يمكنني مساعدتك في شيء متعلق بمتجرنا؟`
+            : `I appreciate your question, but I'm focused on ${config.company} shopping, orders, and policies. Is there anything related to our store I can help you with today?`;
+        }
+      } catch (err) {
+        console.error('Off-topic LLM error:', err);
+        const lang = synonyms.detectLanguage(userInput);
+        response.text = lang === 'ar'
+          ? `أقدر سؤالك، لكنني متخصص في ${config.company} - المنتجات والطلبات والسياسات. هل يمكنني مساعدتك في شيء متعلق بمتجرنا؟`
+          : `I appreciate your question, but I'm focused on ${config.company} shopping, orders, and policies. Is there anything related to our store I can help you with today?`;
+      }
       break;
       
     case INTENTS.VIOLATION:
