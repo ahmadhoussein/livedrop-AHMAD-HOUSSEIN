@@ -127,8 +127,12 @@ function isOriginAllowed(origin, list) {
 
 const corsOptions = {
   origin: (origin, callback) => {
+    console.log('[CORS] Checking origin:', origin);
+    console.log('[CORS] Allowlist:', allowlist);
     const allowed = isOriginAllowed(origin, allowlist);
+    console.log('[CORS] Origin allowed:', allowed);
     if (allowed) return callback(null, true);
+    console.log('[CORS] BLOCKED origin:', origin);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
