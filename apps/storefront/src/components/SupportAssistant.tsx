@@ -23,30 +23,42 @@ const SupportAssistant: React.FC<SupportAssistantProps> = ({ customer }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Load assistant info
-    fetchAssistantInfo()
+    // Load assistant info and welcome message
+    const initializeAssistant = async () => {
+      try {
+        const info = await api.getAssistantInfo()
+        setAssistantInfo(info)
+        
+        // Use backend assistant info for welcome message
+        const assistantName = info?.assistant?.name || 'Ahmad'
+        const assistantRole = info?.assistant?.role || 'Customer Support Specialist'
+        const companyName = info?.assistant?.company || 'Ahmad Store'
+        
+        setMessages([{
+          id: '1',
+          text: `Hello! I'm ${assistantName}, your ${assistantRole} at ${companyName}. How can I help you today? I can assist with orders, products, policies, or any other questions you have.`,
+          sender: 'assistant',
+          timestamp: new Date()
+        }])
+      } catch (error) {
+        console.error('Failed to fetch assistant info:', error)
+        // Fallback welcome message
+        setMessages([{
+          id: '1',
+          text: "Hello! I'm here to help you with orders, products, and policies. How can I assist you today?",
+          sender: 'assistant',
+          timestamp: new Date()
+        }])
+      }
+    }
     
-    // Add welcome message
-    setMessages([{
-      id: '1',
-      text: "Hello! I'm Alex, your Customer Support Specialist at ShopSmart. How can I help you today? I can assist with orders, products, policies, or any other questions you have.",
-      sender: 'assistant',
-      timestamp: new Date()
-    }])
+    initializeAssistant()
   }, [])
 
   useEffect(() => {
     scrollToBottom()
   }, [messages])
 
-  const fetchAssistantInfo = async () => {
-    try {
-      const info = await api.getAssistantInfo()
-      setAssistantInfo(info)
-    } catch (error) {
-      console.error('Failed to fetch assistant info:', error)
-    }
-  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -129,9 +141,9 @@ const SupportAssistant: React.FC<SupportAssistantProps> = ({ customer }) => {
         <div className="card">
           <div style={{ borderBottom: '1px solid #ddd', paddingBottom: '1rem', marginBottom: '1rem' }}>
             <h3>Support Assistant</h3>
-            {assistantInfo && (
+            {assistantInfo && assistantInfo.assistant && (
               <p style={{ fontSize: '0.875rem', color: '#666', marginTop: '0.5rem' }}>
-                {assistantInfo.identity.name} - {assistantInfo.identity.role}
+                {assistantInfo.assistant.name} - {assistantInfo.assistant.role}
               </p>
             )}
           </div>
@@ -171,7 +183,7 @@ const SupportAssistant: React.FC<SupportAssistantProps> = ({ customer }) => {
               <div className="message assistant">
                 <div className="message-content">
                   <div style={{ fontStyle: 'italic', color: '#666' }}>
-                    Alex is typing...
+                    {assistantInfo?.assistant?.name || 'Assistant'} is typing...
                   </div>
                 </div>
               </div>
