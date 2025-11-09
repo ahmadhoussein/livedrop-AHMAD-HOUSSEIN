@@ -105,7 +105,6 @@ const defaultOrigins = [
   'http://localhost:5173',
   'https://livedrop-ahmad-houssein-storefront.vercel.app',
   'https://livedrop-ahmad-houssein-storefront-ci7t7eo27.vercel.app',
-  'https://livedrop-ahmad-houssein-storefront-fiekf8v04.vercel.app',  // New deployment
   'https://*.vercel.app'  // Allow all Vercel preview deployments
 ];
 const allowlist = rawOrigins.length ? rawOrigins : defaultOrigins;
@@ -127,12 +126,8 @@ function isOriginAllowed(origin, list) {
 
 const corsOptions = {
   origin: (origin, callback) => {
-    console.log('[CORS] Checking origin:', origin);
-    console.log('[CORS] Allowlist:', allowlist);
     const allowed = isOriginAllowed(origin, allowlist);
-    console.log('[CORS] Origin allowed:', allowed);
     if (allowed) return callback(null, true);
-    console.log('[CORS] BLOCKED origin:', origin);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
