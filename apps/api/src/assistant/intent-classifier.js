@@ -108,16 +108,17 @@ const INTENT_PATTERNS = {
   
   [INTENTS.VIOLATION]: {
     keywords: [
-      'stupid', 'idiot', 'hate', 'suck', 'damn',
-      'hell', 'racist', 'sexist', 'discriminate'
+      // Use whole word boundaries to avoid false matches like "hello" containing "hell"
     ],
     patterns: [
-      /\b(fuck|shit|bitch|ass)\b/i,
+      /\b(fuck|shit|bitch|ass|hell|damn)\b/i,
+      /\b(stupid|idiot|dumb)\b/i,
+      /\b(hate|suck)\b/i,
       /you('re| are) (stupid|dumb|idiot)/i,
       /hate (you|this)/i,
       /kill yourself/i,
       /go to hell/i,
-      /(racist|sexist|nazi)/i
+      /(racist|sexist|nazi|discriminate)/i
     ]
   },
   
@@ -198,8 +199,10 @@ function classifyIntent(userInput) {
     }
   }
   
-  // Check for violations first (highest priority)
-  if (scores[INTENTS.VIOLATION] > 0) {
+  // Check for violations only if they score higher than chitchat
+  // This prevents "hello" from being misclassified as violation
+  if (scores[INTENTS.VIOLATION] > 0 && 
+      scores[INTENTS.VIOLATION] > scores[INTENTS.CHITCHAT]) {
     return {
       intent: INTENTS.VIOLATION,
       confidence: Math.min(scores[INTENTS.VIOLATION] / 5, 1),
