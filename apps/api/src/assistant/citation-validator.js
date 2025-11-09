@@ -13,13 +13,17 @@ let knowledgeBase = [];
  */
 function loadKnowledgeBase() {
   try {
-    const kbPath = path.join(__dirname, '../../../../docs/ground-truth.json');
+    // Try local docs first (for deployed environment), then monorepo root
+    const localPath = path.join(__dirname, '../../docs/ground-truth.json');
+    const rootPath = path.join(__dirname, '../../../../docs/ground-truth.json');
+    const kbPath = fs.existsSync(localPath) ? localPath : rootPath;
+    
     if (fs.existsSync(kbPath)) {
       const kbContent = fs.readFileSync(kbPath, 'utf8');
       knowledgeBase = JSON.parse(kbContent);
-      console.log(`✅ Knowledge base loaded: ${knowledgeBase.length} policies`);
+      console.log(`✅ Knowledge base loaded: ${knowledgeBase.length} policies from:`, kbPath);
     } else {
-      console.warn('⚠️ ground-truth.json not found');
+      console.warn('⚠️ ground-truth.json not found at either location');
       knowledgeBase = [];
     }
   } catch (error) {

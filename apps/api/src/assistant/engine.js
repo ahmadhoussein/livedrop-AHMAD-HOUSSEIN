@@ -19,11 +19,15 @@ let knowledgeBase = null;
  */
 function loadConfig() {
   try {
-    const yamlPath = path.join(__dirname, '../../../../docs/prompts.yaml');
+    // Try local docs first (for deployed environment), then monorepo root
+    const localPath = path.join(__dirname, '../../docs/prompts.yaml');
+    const rootPath = path.join(__dirname, '../../../../docs/prompts.yaml');
+    const yamlPath = fs.existsSync(localPath) ? localPath : rootPath;
+    
     if (fs.existsSync(yamlPath)) {
       const yamlContent = fs.readFileSync(yamlPath, 'utf8');
       assistantConfig = yaml.load(yamlContent);
-      console.log('✅ Assistant configuration loaded');
+      console.log('✅ Assistant configuration loaded from:', yamlPath);
     } else {
       console.warn('⚠️ prompts.yaml not found, using defaults');
       assistantConfig = getDefaultConfig();
@@ -39,13 +43,17 @@ function loadConfig() {
  */
 function loadKnowledgeBase() {
   try {
-    const kbPath = path.join(__dirname, '../../../../docs/ground-truth.json');
+    // Try local docs first (for deployed environment), then monorepo root
+    const localPath = path.join(__dirname, '../../docs/ground-truth.json');
+    const rootPath = path.join(__dirname, '../../../../docs/ground-truth.json');
+    const kbPath = fs.existsSync(localPath) ? localPath : rootPath;
+    
     if (fs.existsSync(kbPath)) {
       const kbContent = fs.readFileSync(kbPath, 'utf8');
       knowledgeBase = JSON.parse(kbContent);
-      console.log(`✅ Knowledge base loaded: ${knowledgeBase.length} policies`);
+      console.log(`✅ Knowledge base loaded: ${knowledgeBase.length} policies from:`, kbPath);
     } else {
-      console.warn('⚠️ ground-truth.json not found');
+      console.warn('⚠️ ground-truth.json not found at either location');
       knowledgeBase = [];
     }
   } catch (error) {
@@ -248,6 +256,12 @@ async function handlePolicyQuestion(query) {
   ].join('\n');
 
   const llmText = await callLLM(prompt);
+
+  // If LLM returns nothing (not configured), use first policy's answer directly
+  if (!llmText || llmText.trim().length === 0) {
+    const topPolicy = relevantPolicies[0];
+    return `${topPolicy.answer} [${topPolicy.id}]`;
+  }
 
   // Ensure at least one citation exists; if not, append the top policy id
   const citations = citationValidator.extractCitations(llmText || '');
