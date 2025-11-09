@@ -140,40 +140,83 @@ function buildAssistivePlan(userQuery) {
 }
 
 /**
- * Call LLM service with fallback to Hugging Face
+ * Call LLM service with fallback chain: Custom → Groq → Hugging Face
  */
 async function callLLM(prompt, opts = {}) {
+  // Try custom LLM endpoint first (if configured)
   const base = process.env.LLM_ENDPOINT && process.env.LLM_ENDPOINT.trim();
-  
-  // If no LLM endpoint configured, use Hugging Face directly
-  if (!base) {
-    return callHuggingFace(prompt, opts);
+  if (base) {
+    const url = `${base.replace(/\/+$/, '')}/generate`;
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          max_tokens: Number(opts.maxTokens || 256),
+          temperature: Number(opts.temperature || 0.2)
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const result = (data && (data.text || data.answer || '')) || '';
+        if (result) return result;
+      }
+    } catch (err) {
+      console.error('Custom LLM call failed:', err.message || err);
+    }
   }
   
-  const url = `${base.replace(/\/+$/, '')}/generate`;
+  // Try Groq (fast and free) second
+  const groqResult = await callGroq(prompt, opts);
+  if (groqResult) return groqResult;
+  
+  // Try Hugging Face last
+  const hfResult = await callHuggingFace(prompt, opts);
+  if (hfResult) return hfResult;
+  
+  // No LLM available
+  return '';
+}
+
+/**
+ * Groq API (Fast and Free)
+ */
+async function callGroq(prompt, opts = {}) {
+  const apiKey = process.env.GROQ_API_KEY;
+  const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+  
+  if (!apiKey) {
+    console.warn('⚠️ No GROQ_API_KEY configured, skipping Groq call');
+    return '';
+  }
+  
   try {
-    const response = await fetch(url, {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
       body: JSON.stringify({
-        prompt,
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
         max_tokens: Number(opts.maxTokens || 256),
         temperature: Number(opts.temperature || 0.2)
       })
     });
     
     if (!response.ok) {
-      const txt = await response.text();
-      throw new Error(`LLM ${response.status}: ${txt}`);
+      const error = await response.text();
+      throw new Error(`Groq ${response.status}: ${error}`);
     }
     
     const data = await response.json();
-    return (data && (data.text || data.answer || '')) || '';
-  } catch (err) {
-    console.error('LLM call failed:', err.message || err);
-    // Fallback to Hugging Face if configured
-    const hf = await callHuggingFace(prompt, opts);
-    return hf || '';
+    return data.choices[0]?.message?.content?.trim() || '';
+  } catch (e) {
+    console.error('Groq call failed:', e && e.message ? e.message : e);
+    return '';
   }
 }
 
@@ -210,8 +253,25 @@ async function callHuggingFace(prompt, opts = {}) {
     });
     
     const data = await res.json();
+    
+    // Handle error response from HF
+    if (data.error) {
+      console.error('HF API error:', data.error);
+      return '';
+    }
+    
+    // Parse HF response
     if (Array.isArray(data) && data[0] && typeof data[0] === 'object') {
-      return (data[0].generated_text || data[0].text || '').trim();
+      let text = (data[0].generated_text || data[0].text || '').trim();
+      
+      // HF returns full conversation - extract only assistant's response
+      // Remove the prompt part if it's included
+      if (text.includes('Assistant:')) {
+        const parts = text.split('Assistant:');
+        text = parts[parts.length - 1].trim();
+      }
+      
+      return text;
     }
     return '';
   } catch (e) {
