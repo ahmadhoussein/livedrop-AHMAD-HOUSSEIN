@@ -582,11 +582,27 @@ router.post('/chat', async (req, res) => {
         functionResults.push(result);
       }
     } else if (intent.intent === INTENTS.PRODUCT_SEARCH) {
-      // Extract search query
-      const searchMatch = message.match(/(?:looking for|search|find|show me)\s+(.+)/i);
-      if (searchMatch) {
+      // Extract search query - handle multiple patterns
+      let searchQuery = null;
+      
+      // Pattern 1: "looking for X", "search for X", "find X", "show me X"
+      const pattern1 = message.match(/(?:looking for|search(?:ing)? for|find|show me)\s+(.+)/i);
+      if (pattern1) {
+        searchQuery = pattern1[1];
+      }
+      
+      // Pattern 2: "search X" (without "for")
+      if (!searchQuery) {
+        const pattern2 = message.match(/(?:search|find)\s+([a-z].+)/i);
+        if (pattern2) {
+          searchQuery = pattern2[1];
+        }
+      }
+      
+      // Execute search if we have a query
+      if (searchQuery && searchQuery.length > 0) {
         const result = await functionRegistry.execute('searchProducts', {
-          query: searchMatch[1],
+          query: searchQuery,
           limit: 5
         });
         functionsCalled.push('searchProducts');
