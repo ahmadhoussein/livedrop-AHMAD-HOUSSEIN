@@ -18,8 +18,8 @@ export async function answerQuestion(question: string): Promise<{
   const q = question.trim()
   if (!q) return { refused: true }
 
-  // Check for order ID pattern
-  const orderIdMatch = q.match(/([A-Z0-9]{10,})/i)
+  // Check for order ID pattern (8+ hex chars or digits)
+  const orderIdMatch = q.match(/\b([a-f0-9]{8,}|\d{8,})\b/i)
   if (orderIdMatch) {
     const orderId = orderIdMatch[1]
     const status = await getOrderStatus(orderId)
