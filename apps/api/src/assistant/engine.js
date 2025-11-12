@@ -401,15 +401,51 @@ async function generateResponse(userInput, intent, functionResults = []) {
       break;
       
     case INTENTS.ORDER_STATUS:
-      const orderResponse = await handleOrderStatus(userInput);
-      response.text = orderResponse;
-      response.functionsExecuted.push('getOrderStatus');
-      
-      // Check if response contains any policy citations
-      if (orderResponse.includes('[')) {
-        const validation = citationValidator.validateResponse(orderResponse);
-        response.citations = validation.extractedCitations || [];
-        response.citationValidation = validation;
+      // Check if getCustomerOrders was called (email-based query)
+      if (functionResults.length > 0 && functionResults[0].function === 'getCustomerOrders') {
+        const result = functionResults[0];
+        if (result.success) {
+          const data = result.result;
+          if (data.orders.length > 0) {
+            response.text = `📦 **Orders for ${data.customer.name}** (${data.customer.email})\n\n` +
+              data.orders.map(order => 
+                `• Order ${order.orderId.slice(-8)}\n` +
+                `  Status: **${order.status}**\n` +
+                `  Items: ${order.itemCount} item(s)\n` +
+                `  Total: $${order.total}\n` +
+                `  Date: ${new Date(order.createdAt).toLocaleDateString()}`
+              ).join('\n\n') + 
+              `\n\n📞 Need help with a specific order? Share the full order ID.`;
+            response.functionsExecuted.push('getCustomerOrders');
+          } else {
+            response.text = `I couldn't find any orders for ${data.customer.email}. Please double-check the email address.`;
+          }
+        } else {
+          response.text = result.error || 'I had trouble looking up orders for that email. Please try again or contact support.';
+        }
+      } else if (functionResults.length > 0 && functionResults[0].function === 'getOrderStatus') {
+        // getOrderStatus was called (order ID-based query)
+        const result = functionResults[0];
+        if (result.success) {
+          const order = result.result;
+          response.text = `📦 **Order Status Update**\n\n` +
+                 `Order ID: ${order.orderId}\n` +
+                 `Status: **${order.status}**\n` +
+                 `Customer: ${order.customerName}\n` +
+                 `Total: $${order.total}\n` +
+                 `Carrier: ${order.carrier || 'Standard Shipping'}\n` +
+                 `Estimated Delivery: ${new Date(order.estimatedDelivery).toLocaleDateString()}\n\n` +
+                 `Your order is being processed and you'll receive updates as it progresses.`;
+          response.functionsExecuted.push('getOrderStatus');
+        } else {
+          response.text = result.error || "I couldn't find that order. Please double-check the order ID.";
+        }
+      } else {
+        // No function was called - prompt for more info
+        const lang = synonyms.detectLanguage(userInput);
+        response.text = lang === 'ar'
+          ? 'يسعدني التحقق من حالة طلبك. من فضلك زوّدني برقم الطلب الكامل أو بريدك الإلكتروني.'
+          : "I'd be happy to check your order status. Please provide your full order ID or email address.";
       }
       break;
       
@@ -572,14 +608,25 @@ router.post('/chat', async (req, res) => {
     
     // Execute functions based on intent (max 2 function calls)
     if (intent.intent === INTENTS.ORDER_STATUS) {
-      // Extract order ID from message (support 8+ digits or 24-char hex)
-      const orderIdMatch = message.match(/\b(\d{8,}|[a-f0-9]{24})\b/i);
-      if (orderIdMatch) {
-        const result = await functionRegistry.execute('getOrderStatus', {
-          orderId: orderIdMatch[1]  // Use capture group
+      // First check if there's an email address - if so, get all customer orders
+      const emailMatch = message.match(/\b([a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,})\b/i);
+      if (emailMatch) {
+        const result = await functionRegistry.execute('getCustomerOrders', {
+          email: emailMatch[1],
+          limit: 10
         });
-        functionsCalled.push('getOrderStatus');
+        functionsCalled.push('getCustomerOrders');
         functionResults.push(result);
+      } else {
+        // Otherwise, look for an order ID
+        const orderIdMatch = message.match(/\b(\d{8,}|[a-f0-9]{24})\b/i);
+        if (orderIdMatch) {
+          const result = await functionRegistry.execute('getOrderStatus', {
+            orderId: orderIdMatch[1]  // Use capture group
+          });
+          functionsCalled.push('getOrderStatus');
+          functionResults.push(result);
+        }
       }
     } else if (intent.intent === INTENTS.PRODUCT_SEARCH) {
       // Extract search query - handle multiple patterns
