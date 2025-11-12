@@ -154,8 +154,8 @@ export default function AdminDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {metrics?.recentOrders?.slice(0, 5).map((order: any) => (
                 <tr key={order._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order._id.slice(-8)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 font-mono">
+                    {order._id}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {order.customerName}
