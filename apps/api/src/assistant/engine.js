@@ -336,8 +336,8 @@ async function handlePolicyQuestion(query) {
  * Handle order status queries
  */
 async function handleOrderStatus(query) {
-  // Extract order ID from query
-  const orderIdPattern = /\b(\d{10,}|[a-f0-9]{24})\b/i;
+  // Extract order ID from query (support 8+ digits or 24-char hex)
+  const orderIdPattern = /\b(\d{8,}|[a-f0-9]{24})\b/i;
   const match = query.match(orderIdPattern);
   
   if (!match) {
@@ -572,8 +572,8 @@ router.post('/chat', async (req, res) => {
     
     // Execute functions based on intent (max 2 function calls)
     if (intent.intent === INTENTS.ORDER_STATUS) {
-      // Extract order ID from message (support both numeric and hex formats)
-      const orderIdMatch = message.match(/\b(\d{10,}|[a-f0-9]{24})\b/i);
+      // Extract order ID from message (support 8+ digits or 24-char hex)
+      const orderIdMatch = message.match(/\b(\d{8,}|[a-f0-9]{24})\b/i);
       if (orderIdMatch) {
         const result = await functionRegistry.execute('getOrderStatus', {
           orderId: orderIdMatch[1]  // Use capture group
