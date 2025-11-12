@@ -100,14 +100,25 @@ class FunctionRegistry {
       async (params) => {
         const { orderId } = params;
         
-        if (!ObjectId.isValid(orderId)) {
-          throw new Error('Invalid order ID format');
-        }
-        
         const db = getDB();
-        const order = await db.collection('orders').findOne({
-          _id: new ObjectId(orderId)
-        });
+        
+        // Try to find order - support both ObjectId (24 chars) and string IDs (8+ chars)
+        let order;
+        if (ObjectId.isValid(orderId) && orderId.length === 24) {
+          // MongoDB ObjectId format (24 hex characters)
+          order = await db.collection('orders').findOne({
+            _id: new ObjectId(orderId)
+          });
+        } else {
+          // String-based order ID or custom format
+          order = await db.collection('orders').findOne({
+            $or: [
+              { _id: orderId },
+              { orderId: orderId },
+              { orderNumber: orderId }
+            ]
+          });
+        }
         
         if (!order) {
           throw new Error('Order not found');
