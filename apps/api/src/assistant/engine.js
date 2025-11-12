@@ -572,11 +572,11 @@ router.post('/chat', async (req, res) => {
     
     // Execute functions based on intent (max 2 function calls)
     if (intent.intent === INTENTS.ORDER_STATUS) {
-      // Extract order ID from message
-      const orderIdMatch = message.match(/[0-9a-f]{24}/i);
+      // Extract order ID from message (support both numeric and hex formats)
+      const orderIdMatch = message.match(/\b(\d{10,}|[a-f0-9]{24})\b/i);
       if (orderIdMatch) {
         const result = await functionRegistry.execute('getOrderStatus', {
-          orderId: orderIdMatch[0]
+          orderId: orderIdMatch[1]  // Use capture group
         });
         functionsCalled.push('getOrderStatus');
         functionResults.push(result);
